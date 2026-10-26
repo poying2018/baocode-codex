@@ -355,3 +355,14 @@ jobs:
           # The app reads it from the release beside the installer; it is
           # uploaded last, so an app that sees it finds the files it names.
           gh release upload "v$MARKETING" out/latest-codex.json --clobber
+      - name: Check the update chain, from where an app stands
+        if: env.CHANNEL_ONLY != 'true'
+        env:
+          VERSION: ${{ needs.check.outputs.version }}
+        run: |
+          # Live now: fetched anonymously, parsed and verified with the app's
+          # own code, against the key the app carries. A release that
+          # publishes a chain which does not work is caught here, not by the
+          # first person who installs it.
+          dart run tool/check_update_chain.dart \
+            --product baocode-codex --version "$VERSION"

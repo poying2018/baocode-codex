@@ -1,7 +1,7 @@
 # 这个项目：BaoCode Codex
 
 这个仓库**只做 codex 那个产品**（`baocode-codex.exe`，显示名 BaoCode Codex）。
-它在 GitHub 上单独一个仓库：**https://github.com/poying2018/baocode-codex**（私有），
+它在 GitHub 上单独一个仓库：**https://github.com/poying2018/baocode-codex**（公开），
 默认分支 `main`；origin 指它，upstream 仍指官方 `baocode-dev/baocode`（只 fetch）。
 本地是 `F:\Projects\baocode-codex`，从 `F:\Projects\baocode`（BaoCode Claude）分出来的
 **独立项目**：自己的 `.git`、自己的分支、自己的构建目录，两边的开发互不打扰。
@@ -99,6 +99,33 @@ cd F:\Projects\baocode-codex
   flutter test test\settings\product_table_test.dart
   flutter test test\stash
   ```
+
+## 更新链
+
+应用从本仓库的 release 取自己的下一版：
+
+```
+https://github.com/poying2018/baocode-codex/releases/latest/download/latest-codex.json
+```
+
+- 清单是**签名**的（Ed25519；公钥钉在 `lib/update/update_signature.dart`，私钥只在 CI 的
+  `BAOCODE_UPDATE_SIGNING_KEY` Secret 里）。签名覆盖 version、platform、size、sha256。
+- 每个产品一份清单（这个是 `latest-codex.json`，兄弟产品是 `latest.json`），
+  清单里 `product` 不写算 BaoCode 的 ⇒ 这个产品只收自己的。
+- **仓库必须是公开的**：应用是**匿名**取清单和安装包的，私有仓库的 release 资产匿名 404
+  （2026-10-26 因为这个把仓库从私有改成公开）。
+- 发版流程：`dart run tool/bump_version.dart <版本>` → 写 `release-notes/<版本>.{en,zh}.md`
+  → 提交 → `git tag v<版本> && git push origin v<版本>` → CI 构建四平台远端服务器 +
+  Windows 安装包 → 签名 `latest-codex.json` → 建 release → **最后跑一遍链条检查**。
+- 查链条（随时可跑，也进 CI 的发布末尾）：
+
+  ```powershell
+  dart run tool/check_update_chain.dart                    # 这个产品、当前版本、windows-x64
+  dart run tool/check_update_chain.dart --version 1.6.0+18  # 「装的是旧版会不会被提示」
+  ```
+
+  它按应用的方式做：匿名抓清单、用应用自己的解析器、URL 白名单和钉住的公钥验签；
+  任何一环断了就以退出码 1 说明原因。
 
 ## 从原项目拿东西过来
 
