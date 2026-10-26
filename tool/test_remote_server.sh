@@ -54,9 +54,11 @@ for arch in x64 arm64; do
     x64) platform=linux/amd64 machine=x86_64 ;;
     arm64) platform=linux/arm64 machine=aarch64 ;;
   esac
-  binary="$dir/baocode-server-linux-$arch"
-  if [ ! -f "$binary" ]; then
-    echo "No $binary: build it first (dart run tool/build_remote_server.dart)" >&2
+  # Either product's build: the codex one is named after its product
+  # (baocode-codex-server-linux-x64), so the build is found by what it is.
+  binary=$(ls "$dir"/*server-linux-$arch 2> /dev/null | head -n 1)
+  if [ -z "$binary" ] || [ ! -f "$binary" ]; then
+    echo "No baocode-server-linux-$arch in $dir: build it first (dart run tool/build_remote_server.dart)" >&2
     exit 1
   fi
   for image in "${images[@]}"; do

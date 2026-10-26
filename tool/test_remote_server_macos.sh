@@ -44,9 +44,11 @@ EOF
 )
 
 for arch in x64 arm64; do
-  binary="$dir/baocode-server-darwin-$arch"
-  if [ ! -f "$binary" ]; then
-    echo "No $binary: build it first (dart run tool/build_remote_server.dart)" >&2
+  # Either product's build: the codex one is named after its product
+  # (baocode-codex-server-darwin-x64), so the build is found by what it is.
+  binary=$(ls "$dir"/*server-darwin-$arch 2> /dev/null | head -n 1)
+  if [ -z "$binary" ] || [ ! -f "$binary" ]; then
+    echo "No baocode-server-darwin-$arch in $dir: build it first (dart run tool/build_remote_server.dart)" >&2
     exit 1
   fi
   printf '%-8s ' "$arch"
