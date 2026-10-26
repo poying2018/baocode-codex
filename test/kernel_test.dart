@@ -231,6 +231,11 @@ List<String> shown(Transcript transcript) => [
     },
 ].where((line) => line.isNotEmpty).toList();
 
+/// The folder the tests run in: what a kernel made without a context works
+/// in (`CodexKernel`'s own default), so the paths a test hands it are under
+/// this one — and not under a path spelled out for one machine.
+final testRoot = Directory.current.path;
+
 void main() {
   group('Claude Code translator (recorded)', () {
     test('tools, a background command and a subagent', () {
@@ -5934,7 +5939,7 @@ exec /usr/bin/env "\$@"
             id: 'th',
             title: 'kept',
             updatedAt: DateTime(2026),
-            cwd: r'F:\Projects\baocode',
+            cwd: testRoot,
           ),
         ),
       )..events.listen(historyEvents.add);
@@ -5973,7 +5978,7 @@ exec /usr/bin/env "\$@"
       };
       server.answers['fuzzyFileSearch'] = {
         'files': [
-          {'path': r'F:\Projects\baocode\lib\main.dart', 'match_type': 'file'},
+          {'path': p.join(testRoot, 'lib', 'main.dart'), 'match_type': 'file'},
         ],
       };
       kernel.send(const KernelTurn(id: 't1', text: 'hi'));
@@ -6081,7 +6086,7 @@ exec /usr/bin/env "\$@"
             'threadId': 'th',
             'turnId': 'st1',
             'itemId': 'p1',
-            'cwd': r'F:\Projects\baocode',
+            'cwd': testRoot,
             'startedAtMs': 1,
             'permissions': {
               'network': {'enabled': true},
