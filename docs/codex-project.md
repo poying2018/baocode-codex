@@ -26,7 +26,39 @@
 所以上游（`baocode-dev/baocode`）的同步、以及原项目里跟两个产品都有关的修复，
 都可以按下面的办法拿过来。
 
-## 构建、运行、测试
+## 内置的 Codex CLI
+
+这个产品**自带 Codex CLI**：安装包里带着它，用户不用装、不用下，第一次对话就能用
+（和 BaoCode Claude 自带 Claude Code 是一个道理）。
+
+- 包里放哪：`codex-cli\`（挨着 `baocode-codex.exe`），里面是平台 npm 包的原样布局
+  `vendor\x86_64-pc-windows-msvc\{bin\codex.exe, codex-resources\, codex-path\}`——
+  程序按相对位置找它自己的资源，布局不能改。
+- 谁放进去的：`tool/build_windows.dart` 的 `_putCodex()`。版本与 SHA-256 钉在脚本顶部
+  （`_codexVersion` / `_codexSha256`）：
+
+  ```dart
+  const _codexVersion = '0.164.0';
+  const _codexPlatform = 'win32-x64';
+  const _codexSha256 = '4fbd2347…41a65b';   // 这个平台包的 tgz
+  const _codexUrl = 'https://registry.npmjs.org/@openai/codex/-/codex-$_codexVersion-$_codexPlatform.tgz';
+  ```
+
+  下载一次缓存在 `build\codex\`，以后离线构建也能用；换版本时改这三行。
+- 应用怎么找到它：`ProcessCodexTransport.locateCodex()` 的顺序是
+  **`BAOCODE_CODEX_COMMAND`（环境里指定的）→ 用户自己装的（PATH / npm 全局 / Codex Desktop）
+  → 包里带的**。包里那份是「地板」：用户有自己的就用用户的（可能更新、已登录）。
+- 想确认当前会用哪一份：
+
+  ```powershell
+  dart tool/check_codex_bundle.dart                                  # 这个仓库自己的
+  dart tool/check_codex_bundle.dart build\windows\x64\runner\Release\baocode-codex.exe
+  ```
+
+  它会说：包里带的在哪、能不能报版本、最终会跑哪一个。
+- 装上之后 `codex-cli\` 在 Program Files 里（只读没问题，是可执行文件），
+  状态（会话、登录）仍然写用户的数据目录 `%APPDATA%\baocode-codex\codex\`。
+
 
 ```powershell
 # 会话环境（和原项目一样：Flutter 3.47.5、共享的 pub 缓存、工作区内的临时目录）

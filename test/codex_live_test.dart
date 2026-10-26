@@ -140,7 +140,7 @@ void main() {
     )..createSync(recursive: true);
     DataDirectory.current = DataDirectory(home.path);
     final kernel = KernelRegistry.codex.create(
-      const KernelContext(cwd: r'F:\Projects\baocode'),
+      KernelContext(cwd: Directory.current.path),
     ) as CodexKernel;
     addTearDown(() async {
       kernel.dispose();
@@ -159,12 +159,20 @@ void main() {
     }
     expect(kernel.health.status, KernelHealthStatus.ready);
     expect(kernel.model.options, isNotEmpty);
-    expect(
-      File(
-        '${home.path}${Platform.pathSeparator}codex'
-        '${Platform.pathSeparator}config.toml',
-      ).existsSync(),
-      isTrue,
+    // The user's own settings are copied in where there are any: a machine
+    // that has never run a Codex has none, and the app keeps none of them.
+    final theirs = File(
+      '${Platform.environment['USERPROFILE']}\\.codex'
+      '${Platform.pathSeparator}config.toml',
     );
+    if (theirs.existsSync()) {
+      expect(
+        File(
+          '${home.path}${Platform.pathSeparator}codex'
+          '${Platform.pathSeparator}config.toml',
+        ).existsSync(),
+        isTrue,
+      );
+    }
   }, timeout: const Timeout(Duration(minutes: 1)));
 }

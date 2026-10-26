@@ -48,6 +48,7 @@ import 'dart:io';
 
 import 'package:baocode/platform/app_paths.dart';
 import 'package:crypto/crypto.dart';
+import 'package:path/path.dart' as p;
 
 /// Where the bundle flutter leaves behind goes, and where the installer is
 /// written. Under build/, which the repository already ignores and flutter
@@ -102,6 +103,27 @@ const _claudeSha256 =
 /// Where that build is: the release's own file for Windows x64.
 const _claudeUrl =
     'https://downloads.claude.ai/claude-code-releases/$_claudeVersion/win32-x64/claude.exe';
+
+/// The Codex CLI the bundle carries (OpenAI's own program, published for
+/// each platform as the npm package `@openai/codex` with the platform in
+/// the version), that version, and the SHA-256 of this platform's package.
+///
+/// The app runs it as it is, so that a machine with no Codex of its own
+/// needs no install and no download. The version is pinned here, and the
+/// build checked against its SHA-256, so that a build carries that one
+/// build and no other: after choosing another version, update these three.
+const _codexVersion = '0.164.0';
+const _codexPlatform = 'win32-x64';
+const _codexSha256 =
+    '4fbd23473a2fc223396cdd8490d3f658d368438134c12a3f1dac9d1e2041a65b';
+
+/// Where that package is: the npm registry's own file for the platform.
+const _codexUrl =
+    'https://registry.npmjs.org/@openai/codex/-/codex-$_codexVersion-$_codexPlatform.tgz';
+
+/// The folder in that package the program and the resources it finds
+/// beside itself are in. Kept as it is: the program looks for them there.
+const _codexVendor = r'vendor\x86_64-pc-windows-msvc';
 
 /// SHA-256 of Flutter's own release flutter_windows.dll that
 /// tool/engine/flutter_windows.dll was built to replace (3.47.5), and of that
@@ -289,15 +311,20 @@ Future<void> main(List<String> arguments) async {
   await _putOpenSsh(root, bundle);
   _checkBundle(bundle, [for (final name in _openSshFiles) 'openssh\\$name']);
 
-  // Claude Code itself, so that a machine with none of its own needs no
-  // install and no download. The codex product carries none of it: it has
-  // no Claude Code to carry.
+  // What the agent is: Claude Code for one product, and for the other the
+  // Codex CLI. Either comes with the app, so that a machine with none of
+  // its own needs no install and no download.
   if (spec.hasClaudeCode) {
     _step('Putting in Claude Code $_claudeVersion');
     await _putClaude(root, bundle);
     _checkBundle(bundle, [r'claude\claude.exe', r'claude\VERSION']);
   } else {
-    _step('Leaving Claude Code out (the codex product carries none)');
+    _step('Putting in Codex $_codexVersion');
+    await _putCodex(root, bundle);
+    _checkBundle(bundle, [
+      r'codex-cli\VERSION',
+      'codex-cli\\$_codexVendor\\bin\\codex.exe',
+    ]);
   }
 
   _step('Compiling the installer');
@@ -541,6 +568,70 @@ Future<void> _putClaude(Directory root, Directory bundle) async {
   target.createSync(recursive: true);
   file.copySync('${target.path}\\claude.exe');
   File('${target.path}\\VERSION').writeAsStringSync('$_claudeVersion\n');
+}
+
+/// Puts the Codex CLI the bundle carries in `codex-cli\`: this platform's
+/// npm package, downloaded into build\codex\ once and checked against
+/// [_codexSha256] each time, then unpacked as it is — the program finds
+/// the resources it needs beside itself that way. The `VERSION` file names
+/// the build, as the app reads it to know what it carries.
+Future<void> _putCodex(Directory root, Directory bundle) async {
+  final cache = Directory('${root.path}\\build\\codex');
+  final archive = File(
+    '${cache.path}\\codex-$_codexVersion-$_codexPlatform.tgz',
+  );
+  if (!archive.existsSync() || await _sha256Of(archive) != _codexSha256) {
+    final url = Uri.parse(_codexUrl);
+    stdout.writeln('  Downloading $url');
+    cache.createSync(recursive: true);
+    final part = File('${archive.path}.part');
+    final client = HttpClient();
+    try {
+      final response = await (await client.getUrl(url)).close();
+      if (response.statusCode != 200) {
+        _fail('$url answered ${response.statusCode}.');
+      }
+      await response.pipe(part.openWrite());
+    } finally {
+      client.close();
+    }
+    if (await _sha256Of(part) != _codexSha256) {
+      part.deleteSync();
+      _fail(
+        'The Codex download is not the one this script expects.\n'
+        'After choosing another version, update _codexVersion and\n'
+        '_codexSha256 in this script.',
+      );
+    }
+    part.renameSync(archive.path);
+  }
+  final unpacked = Directory('${cache.path}\\unpacked-$_codexVersion');
+  if (unpacked.existsSync()) unpacked.deleteSync(recursive: true);
+  unpacked.createSync(recursive: true);
+  // Windows' own tar (bsdtar) reads the npm package's gzipped tar.
+  await _run('tar', ['-xzf', archive.path, '-C', unpacked.path], root.path);
+  final vendor = Directory('${unpacked.path}\\package\\$_codexVendor');
+  if (!vendor.existsSync()) {
+    _fail('No $_codexVendor in the Codex package ${archive.path}.');
+  }
+  final carried = Directory('${bundle.path}\\codex-cli');
+  if (carried.existsSync()) carried.deleteSync(recursive: true);
+  _copyTree(vendor, Directory('${carried.path}\\$_codexVendor'));
+  File('${carried.path}\\VERSION').writeAsStringSync(
+    '$_codexVersion-$_codexPlatform\n',
+  );
+}
+
+/// Every file of [source] with the same path under [target], the folders
+/// between made as they are met.
+void _copyTree(Directory source, Directory target) {
+  for (final entity in source.listSync(recursive: true)) {
+    if (entity is! File) continue;
+    final relative = p.relative(entity.path, from: source.path);
+    final copy = File(p.join(target.path, relative));
+    copy.parent.createSync(recursive: true);
+    entity.copySync(copy.path);
+  }
 }
 
 /// The file's SHA-256, in hex: read in pieces, so that a file of a few

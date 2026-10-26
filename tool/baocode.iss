@@ -129,14 +129,15 @@ Name: "contextmenu"; \
   GroupDescription: "Other:"
 
 [Files]
-; The whole bundle: baocode.exe, the engine and plugin DLLs, data\ (the
-; AOT app.so and flutter_assets) which sit beside the executable, and
-; remote\ (VERSION and servers.json: which baocode-server remote projects
-; run on their host, and where the app downloads it; tool/build_windows.dart
-; puts them there), openssh\ (OpenSSH for Windows, for remote projects
-; where the system's ssh is too old to ask for a password), and claude\
-; (Claude Code itself, so that a machine with none of its own needs no
-; install and no download; tool/build_windows.dart puts it there).
+; The whole bundle: baocode-codex.exe, the engine and plugin DLLs, data\
+; (the AOT app.so and flutter_assets) which sit beside the executable, and
+; remote\ (VERSION and servers.json: which baocode-codex-server remote
+; projects run on their host, and where the app downloads it;
+; tool/build_windows.dart puts them there), openssh\ (OpenSSH for Windows,
+; for remote projects where the system's ssh is too old to ask for a
+; password), and codex-cli\ (the Codex CLI itself, so that a machine with
+; none of its own needs no install and no download; tool/build_windows.dart
+; puts it there).
 Source: "{#BundleDir}\*"; DestDir: "{app}"; \
   Flags: ignoreversion recursesubdirs createallsubdirs
 

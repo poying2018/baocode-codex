@@ -150,19 +150,19 @@ Future<void> main(List<String> arguments) async {
       '  $file (${(bytes.length / 1048576).toStringAsFixed(1)} MB)',
     );
   }
-  File('${out.path}/$_serversFile').writeAsStringSync(
+  File('${out.path}/${_serversFile(spec)}').writeAsStringSync(
     '${const JsonEncoder.withIndent('  ').convert({'version': name, 'files': files})}\n',
   );
   _step('Done: ${out.path} ($name)');
   stdout
     ..writeln()
     ..writeln('Publish the builds, which the app downloads, where')
-    ..writeln('servers.json says they are:')
+    ..writeln('${_serversFile(spec)} says they are:')
     ..writeln('  gh release create $name --repo $_repository \\')
     ..writeln('    --title "$name" --notes "" --latest=false \\')
     ..writeln(
-      '    ${out.path}/${_serverPrefix(spec)}-*.gz ${out.path}/$_serversFile '
-      '${out.path}/VERSION',
+      '    ${out.path}/${_serverPrefix(spec)}-*.gz '
+      '${out.path}/${_serversFile(spec)} ${out.path}/VERSION',
     );
 }
 

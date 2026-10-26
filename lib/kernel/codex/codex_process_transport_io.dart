@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:path/path.dart' as p;
 
+import 'codex_bundle.dart';
 import 'codex_transport.dart';
 
 /// `codex app-server` as a local process: JSON-RPC 2.0 over its stdio, one
@@ -168,6 +169,11 @@ class ProcessCodexTransport implements CodexTransport {
           found.add(CodexExecutable(file.path));
         }
       }
+    }
+    // The one this app carries, which is the floor under the others: a
+    // machine with no Codex of its own needs no install and no download.
+    if (CodexBundle.find() case final bundled?) {
+      found.add(CodexExecutable(bundled));
     }
     return found;
   }
