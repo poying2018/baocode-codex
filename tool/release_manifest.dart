@@ -55,7 +55,7 @@ import 'package:crypto/crypto.dart' as crypto;
 /// lib/update/update_service.dart); upstream's dl.baocode.dev serves the
 /// same manifests for the official builds.
 const _releasesBase =
-    'https://github.com/poying2018/baocode/releases/download';
+    'https://github.com/poying2018/baocode-codex/releases/download';
 
 /// [name]'s link, for the file whose SHA-256 is [sha256]. The version is
 /// the marketing one (1.5.1), as the release's tag carries it.

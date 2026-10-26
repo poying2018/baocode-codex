@@ -22,7 +22,7 @@ String manifestOf(
     for (final platform in platforms)
       platform: {
         'url':
-            'https://github.com/poying2018/baocode/releases/download/'
+            'https://github.com/poying2018/baocode-codex/releases/download/'
             '$version/$platform.bin',
         'size': 100,
         'sha256': 'a' * 64,

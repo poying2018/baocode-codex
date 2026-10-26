@@ -135,7 +135,7 @@ const _patchedEngineSha256 =
 
 /// Where the remote server's builds are published: a release of this
 /// repository tagged with their VERSION (tool/build_remote_server.dart).
-const _remoteRepo = 'poying2018/baocode';
+const _remoteRepo = 'poying2018/baocode-codex';
 const _remoteBase = 'https://github.com/$_remoteRepo/releases/download';
 
 Future<void> main(List<String> arguments) async {

@@ -37,7 +37,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.text('github.com/poying2018/baocode · 免费开源，GPL-3.0 许可证'),
+      find.text('github.com/poying2018/baocode-codex · 免费开源，GPL-3.0 许可证'),
       findsOneWidget,
     );
     expect(find.text('去 GitHub 点 Star'), findsOneWidget);
@@ -50,11 +50,11 @@ void main() {
   test('its links', () {
     expect(
       AppLinks.issues,
-      Uri.parse('https://github.com/poying2018/baocode/issues'),
+      Uri.parse('https://github.com/poying2018/baocode-codex/issues'),
     );
     expect(
       AppLinks.releases,
-      Uri.parse('https://github.com/poying2018/baocode/releases'),
+      Uri.parse('https://github.com/poying2018/baocode-codex/releases'),
     );
   });
 }

@@ -88,7 +88,7 @@ void main() {
     test("a wrong entry for this platform is a failed check", () async {
       final backend = FakeBackend(
         manifestOf('1.2.0').replaceFirst(
-          'https://github.com/poying2018/baocode/releases/download/1.2.0/windows-x64.bin',
+          'https://github.com/poying2018/baocode-codex/releases/download/1.2.0/windows-x64.bin',
           'https://evil.example/windows-x64.bin',
         ),
       );

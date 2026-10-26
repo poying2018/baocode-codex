@@ -1,8 +1,10 @@
 # 这个项目：BaoCode Codex
 
 这个仓库**只做 codex 那个产品**（`baocode-codex.exe`，显示名 BaoCode Codex）。
-它是从 `F:\Projects\baocode`（BaoCode Claude，即原来的 BaoCode 项目）分出来的**独立项目**：
-自己的 `.git`、自己的分支、自己的构建目录，两边的开发互不打扰。
+它在 GitHub 上单独一个仓库：**https://github.com/poying2018/baocode-codex**（私有），
+默认分支 `main`；origin 指它，upstream 仍指官方 `baocode-dev/baocode`（只 fetch）。
+本地是 `F:\Projects\baocode-codex`，从 `F:\Projects\baocode`（BaoCode Claude）分出来的
+**独立项目**：自己的 `.git`、自己的分支、自己的构建目录，两边的开发互不打扰。
 
 ## 为什么分开
 
@@ -19,8 +21,10 @@
 | | `F:\Projects\baocode` | 这里 |
 | --- | --- | --- |
 | 产品 | BaoCode Claude（`baocode-claude.exe`） | BaoCode Codex（`baocode-codex.exe`） |
-| 分支 | 他们自己的（`main` / `dev` / `feature/codex-kernel`） | `codex-product` |
+| GitHub | `poying2018/baocode`（他们的） | **`poying2018/baocode-codex`**（自己的） |
+| 分支 | 他们自己的（`main` / `dev` / `feature/codex-kernel`） | `main` |
 | 默认构建的产品 | `baocode-claude` | `baocode-codex`（这个仓库里就一直是这样） |
+| 更新通道 | 本仓库 release 的 `latest.json` | **本仓库 release 的 `latest-codex.json`** |
 
 两边**共享历史**：这里是从原仓库的 `feature/codex-kernel` 克隆出来的，
 所以上游（`baocode-dev/baocode`）的同步、以及原项目里跟两个产品都有关的修复，

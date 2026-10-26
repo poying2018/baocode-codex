@@ -73,7 +73,7 @@ const _remoteReleaseRelative = 'build/remote-release';
 
 /// Where the remote server's builds are published: a release of this
 /// repository tagged with their VERSION (tool/build_remote_server.dart).
-const _remoteRepo = 'poying2018/baocode';
+const _remoteRepo = 'poying2018/baocode-codex';
 const _remoteBase = 'https://github.com/$_remoteRepo/releases/download';
 
 /// The browser's native messaging host, beside the app's executable.

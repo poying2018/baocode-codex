@@ -35,7 +35,7 @@ class UpdateController {
   /// [version]'s notes on this fork's GitHub release page.
   static Uri changelogUrl(AppVersion version, String languageCode) =>
       Uri.parse(
-        'https://github.com/poying2018/baocode/releases/tag/v$version',
+        'https://github.com/poying2018/baocode-codex/releases/tag/v$version',
       );
 
   bool _restarting = false;

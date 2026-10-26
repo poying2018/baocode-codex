@@ -20,7 +20,7 @@ import 'dart:convert';
 import 'dart:io';
 
 /// The repository the builds are published in.
-const _repository = 'poying2018/baocode';
+const _repository = 'poying2018/baocode-codex';
 
 /// Where they are downloaded from: a release tagged with the build's
 /// VERSION, its assets the gzipped builds and `servers.json`

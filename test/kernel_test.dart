@@ -4806,7 +4806,7 @@ void main() {
       expect(flagSettings(launch(CommitAttribution.baocode)), {
         'attribution': {
           'commit': 'Co-Authored-By: BaoCode <noreply@poying2018.com>',
-          'pr': '🤖 Generated with [BaoCode](https://github.com/poying2018/baocode)',
+          'pr': '🤖 Generated with [BaoCode](https://github.com/poying2018/baocode-codex)',
         },
       });
       expect(flagSettings(launch(CommitAttribution.none)), {

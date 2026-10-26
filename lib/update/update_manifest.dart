@@ -8,7 +8,7 @@ import 'version.dart';
 /// published with this fork's GitHub releases (docs/auto-update.md has
 /// its format).
 const defaultManifestUrl =
-    'https://github.com/poying2018/baocode/releases/latest/download/latest.json';
+    'https://github.com/poying2018/baocode-codex/releases/latest/download/latest.json';
 
 /// Where the app of [product] looks for its next version: the manifest
 /// of that product.
@@ -17,7 +17,7 @@ const defaultManifestUrl =
 /// update of the other: each has its own manifest, in the same release.
 String manifestUrlFor(String product) => switch (product) {
   'baocode-codex' =>
-    'https://github.com/poying2018/baocode/releases/latest/download/'
+    'https://github.com/poying2018/baocode-codex/releases/latest/download/'
         'latest-codex.json',
   _ => defaultManifestUrl,
 };

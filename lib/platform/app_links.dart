@@ -13,7 +13,7 @@ library;
 abstract final class AppLinks {
   /// The repository this build is made in, and where a bug is told of.
   static final Uri repository = Uri.parse(
-    'https://github.com/poying2018/baocode',
+    'https://github.com/poying2018/baocode-codex',
   );
 
   /// The releases: where an update is downloaded from, and what the
@@ -38,6 +38,6 @@ abstract final class AppLinks {
   /// repository itself. The path ends in a slash, so a file's name
   /// resolves beside it rather than in place of the last part.
   static final Uri siteBase = Uri.parse(
-    'https://raw.githubusercontent.com/poying2018/baocode/main/site/',
+    'https://raw.githubusercontent.com/poying2018/baocode-codex/main/site/',
   );
 }

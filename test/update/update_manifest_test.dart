@@ -7,7 +7,7 @@ import 'package:baocode/update/version.dart';
 final _signature = base64.encode(List.filled(64, 7));
 
 Map<String, Object?> _asset({
-  String url = 'https://github.com/poying2018/baocode/releases/download/v1.2.0/BaoCode-1.2.0-setup.exe',
+  String url = 'https://github.com/poying2018/baocode-codex/releases/download/v1.2.0/BaoCode-1.2.0-setup.exe',
   Object? size = 1000,
   Object? sha256,
   Object? signature,
@@ -35,7 +35,7 @@ String _manifest({
       {
         'windows-x64': _asset(),
         'macos-arm64': _asset(
-          url: 'https://github.com/poying2018/baocode/releases/download/v1.2.0/BaoCode-1.2.0-mac.zip',
+          url: 'https://github.com/poying2018/baocode-codex/releases/download/v1.2.0/BaoCode-1.2.0-mac.zip',
         ),
       },
 });
@@ -93,14 +93,14 @@ void main() {
             platforms: {
               'windows-x64': _asset(
                 url:
-                    'https://github.com/poying2018/baocode/releases/download/v1.2.0/'
+                    'https://github.com/poying2018/baocode-codex/releases/download/v1.2.0/'
                     'BaoCode-1.2.0-setup.exe?sha256=0123456789abcdef',
               ),
             },
           ),
         ),
         'downloads': {
-          'macos': {'url': 'https://github.com/poying2018/baocode/releases/download/v1.2.0/x.dmg', 'size': 1},
+          'macos': {'url': 'https://github.com/poying2018/baocode-codex/releases/download/v1.2.0/x.dmg', 'size': 1},
         },
       });
       final asset = UpdateManifest.parse(text).assetFor('windows-x64')!;
@@ -119,8 +119,8 @@ void main() {
       // The link is decoded before it is named: a name with a path in
       // it would put the file outside the folder it belongs in.
       for (final url in [
-        'https://github.com/poying2018/baocode/releases/download/v1.2.0/%2E%2E%2F%2E%2E%2Fevil.exe',
-        'https://github.com/poying2018/baocode/releases/download/v1.2.0/%2E%2E%5C%2E%2E%5Cevil.exe',
+        'https://github.com/poying2018/baocode-codex/releases/download/v1.2.0/%2E%2E%2F%2E%2E%2Fevil.exe',
+        'https://github.com/poying2018/baocode-codex/releases/download/v1.2.0/%2E%2E%5C%2E%2E%5Cevil.exe',
       ]) {
         final manifest = UpdateManifest.parse(
           _manifest(platforms: {'windows-x64': _asset(url: url)}),
@@ -135,7 +135,7 @@ void main() {
         _manifest(
           platforms: {
             'windows-x64': _asset(
-              url: 'https://github.com/poying2018/baocode/releases/download/v1.2.0/..',
+              url: 'https://github.com/poying2018/baocode-codex/releases/download/v1.2.0/..',
             ),
           },
         ),
@@ -178,7 +178,7 @@ void main() {
           platforms: {
             'windows-x64': _asset(size: null),
             'macos-arm64': _asset(
-              url: 'https://github.com/poying2018/baocode/releases/download/v1.2.0/BaoCode-1.2.0-mac.zip',
+              url: 'https://github.com/poying2018/baocode-codex/releases/download/v1.2.0/BaoCode-1.2.0-mac.zip',
             ),
           },
         ),
@@ -229,7 +229,7 @@ void main() {
         );
       }
       for (final url in [
-        'https://github.com/poying2018/baocode/releases/download/v1.2.0+14/BaoCode-1.2.0-setup.exe',
+        'https://github.com/poying2018/baocode-codex/releases/download/v1.2.0+14/BaoCode-1.2.0-setup.exe',
         'https://GITHUB.com/x.exe',
         'https://objects.githubusercontent.com/x.exe',
       ]) {
@@ -250,7 +250,7 @@ void main() {
         isNotNull,
       );
       expect(
-        at('https://github.com/poying2018/baocode/releases/download/v1.2.0/x.exe').assetFor('windows-x64'),
+        at('https://github.com/poying2018/baocode-codex/releases/download/v1.2.0/x.exe').assetFor('windows-x64'),
         isNotNull,
       );
       expect(

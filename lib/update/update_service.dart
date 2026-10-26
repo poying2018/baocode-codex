@@ -77,7 +77,7 @@ class ManualUpdateRequired implements Exception {
   const ManualUpdateRequired(this.reason);
 
   static final downloadPage = Uri.parse(
-    'https://github.com/poying2018/baocode/releases/latest',
+    'https://github.com/poying2018/baocode-codex/releases/latest',
   );
 
   final String reason;

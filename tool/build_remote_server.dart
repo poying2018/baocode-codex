@@ -40,7 +40,7 @@ import 'package:crypto/crypto.dart';
 const _platforms = ['linux-x64', 'linux-arm64', 'darwin-x64', 'darwin-arm64'];
 
 /// The repository whose releases the builds are published in.
-const _repository = 'poying2018/baocode';
+const _repository = 'poying2018/baocode-codex';
 
 /// Where the gzipped builds are downloaded from: `<base>/<VERSION>/<file>`,
 /// a release of [_repository] tagged with the build's VERSION. A build is

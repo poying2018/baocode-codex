@@ -21,7 +21,7 @@ enum CommitAttribution {
   static const baoCodeCommit =
       'Co-Authored-By: BaoCode <noreply@poying2018.com>';
   static const baoCodePullRequest =
-      '🤖 Generated with [BaoCode](https://github.com/poying2018/baocode)';
+      '🤖 Generated with [BaoCode](https://github.com/poying2018/baocode-codex)';
 
   static CommitAttribution parse(Object? setting) =>
       values.where((value) => value.name == setting).firstOrNull ?? fallback;
