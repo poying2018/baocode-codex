@@ -40,7 +40,6 @@ Future<void> main(List<String> arguments) async {
     _broken('the manifest answered $status — an installed app fetches it '
         'with no token, so a private repository (or a wrong URL) is a '
         'chain that does not work');
-    return;
   }
   stdout.writeln('fetched:  ${utf8.encode(text).length} bytes, signed '
       'manifest is what it is');
@@ -50,13 +49,11 @@ Future<void> main(List<String> arguments) async {
     manifest = UpdateManifest.parse(text);
   } on UpdateManifestException catch (error) {
     _broken('the manifest does not parse: ${error.message}');
-    return;
   }
 
   if (!manifest.isFor(product)) {
     _broken('the manifest is for "${manifest.product ?? 'baocode'}", not '
         '$product — the app would refuse it as another product\'s');
-    return;
   }
   stdout.writeln('version:  ${manifest.version}');
   stdout.writeln('notes:    ${manifest.notes.keys.join(', ')}');
@@ -65,14 +62,12 @@ Future<void> main(List<String> arguments) async {
   if (asset == null) {
     _broken('no $platform in it — the app on that platform is offered '
         'nothing');
-    return;
   }
   stdout.writeln('download: ${asset.url}');
   stdout.writeln('  size ${asset.size}, sha256 ${asset.sha256}');
 
   if (!UpdateUrlPolicy.forManifest(manifestUrl).allows(asset.url)) {
     _broken('the download is not on a host the app may fetch from');
-    return;
   }
   final verified = UpdateSignature.verify(
     payload: UpdateSignature.payload(
@@ -86,7 +81,6 @@ Future<void> main(List<String> arguments) async {
   if (!verified) {
     _broken('the signature does not verify against the key the app carries '
         '($updatePublicKey) — the app would refuse this update');
-    return;
   }
   stdout.writeln('signature: verifies ($updatePublicKey)');
 
