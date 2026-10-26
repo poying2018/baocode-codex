@@ -151,17 +151,17 @@ jobs:
         if: steps.version.outputs.publish == 'true'
         with:
           version: stable
-      - name: Carry a Claude Code that is not out
+      - name: Carry a Codex that is not out
         if: steps.version.outputs.publish == 'true'
         run: |
-          # The bundle carries Claude Code itself, pinned by version and
-          # SHA-256 in tool/build_windows.dart: a machine with none of its
+          # The bundle carries the Codex CLI itself, pinned by version and
+          # checksum in tool/build_windows.dart: a machine with none of its
           # own needs no install and no download. It cannot update itself,
           # so the pin is what the release carries — a release with an old
-          # one ships an old agent. The pin is kept current by the Claude
-          # Code version workflow (.github/workflows/claude-version.yml);
-          # this is the backstop.
-          dart tool/bump_claude_version.dart
+          # one ships an old agent. The pin is kept current by the Codex
+          # version workflow (.github/workflows/codex-version.yml); this is
+          # the backstop.
+          dart tool/bump_codex_version.dart
 
   # Once for each product: they carry its servers.json, and download the
   # build a host needs (docs/ssh-remote.md, 9.3). Its

@@ -1,12 +1,12 @@
-# Keeps the Claude Code the Windows bundle carries current.
+# Keeps the Codex CLI the Windows bundle carries current.
 #
-# The bundle carries Claude Code itself (tool/build_windows.dart), so that a
-# machine with none of its own needs no install and no download. That copy
-# cannot update itself - it would put another in the user's ~/.local - so
-# the version and the SHA-256 of the build it is are pinned, and this is
-# what keeps the pin at the current build.
+# The bundle carries the Codex CLI itself (tool/build_windows.dart), so that
+# a machine with none of its own needs no install and no download. That copy
+# cannot update itself - the app runs it from where it is, read-only, under
+# Program Files - so the version and the checksum of the package it is are
+# pinned, and this is what keeps the pin at the current build.
 #
-#   Actions -> Claude Code version -> Run workflow
+#   Actions -> Codex version -> Run workflow
 #                                      bump it now
 #
 # It runs on its own every day. The release's own check (release.yml) says
@@ -14,26 +14,27 @@
 # happening: the check is the backstop, this is the keeping up.
 #
 # The pin is changed in one commit, on main, by the bot. The build then
-# carries that one build: it is checked against the SHA-256 in the pin, so
-# a build carries that build and no other.
-name: Claude Code version
+# carries that one build: it is checked against the checksum in the pin, so
+# a build carries that build and no other. The checksum is the registry's
+# own (`dist.integrity`), so nothing is downloaded to keep the pin current.
+name: Codex version
 
 on:
   schedule:
     # Once a day, at a quiet hour (UTC).
-    - cron: '23 4 * * *'
+    - cron: '37 4 * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: claude-version
+  group: codex-version
   cancel-in-progress: false
 
 jobs:
   bump:
-    name: Bump the pinned Claude Code
+    name: Bump the pinned Codex CLI
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -43,22 +44,22 @@ jobs:
         with:
           version: stable
       - name: Put the current build in the pin
-        run: dart tool/bump_claude_version.dart --write
+        run: dart tool/bump_codex_version.dart --write
       - name: Commit it
         run: |
           if git diff --quiet; then
             echo "The pin is at the current build."
             exit 0
           fi
-          version=$(sed -n "s/^const _claudeVersion = '\(.*\)';/\1/p" tool/build_windows.dart)
+          version=$(sed -n "s/^const _codexVersion = '\(.*\)';/\1/p" tool/build_windows.dart)
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -am "ci(claude): bump Claude Code to $version"
+          git commit -am "ci(codex): bump the Codex CLI to $version"
           # Someone may have pushed while this ran.
           git pull --rebase origin main
           git push
           {
-            echo "## Claude Code $version"
+            echo "## Codex CLI $version"
             echo
-            echo "The build the Windows bundle carries is now Claude Code $version."
+            echo "The build the Windows bundle carries is now the Codex CLI $version."
           } >> "$GITHUB_STEP_SUMMARY"

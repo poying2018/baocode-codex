@@ -106,16 +106,18 @@ const _claudeUrl =
 
 /// The Codex CLI the bundle carries (OpenAI's own program, published for
 /// each platform as the npm package `@openai/codex` with the platform in
-/// the version), that version, and the SHA-256 of this platform's package.
+/// the version), that version, and the checksum the registry gives for
+/// this platform's package (`sha512-<base64>`: its `dist.integrity`).
 ///
 /// The app runs it as it is, so that a machine with no Codex of its own
 /// needs no install and no download. The version is pinned here, and the
-/// build checked against its SHA-256, so that a build carries that one
-/// build and no other: after choosing another version, update these three.
+/// build checked against that checksum, so that a build carries that one
+/// build and no other: after choosing another version, update these three
+/// (tool/bump_codex_version.dart does it, and says when one is out).
 const _codexVersion = '0.164.0';
 const _codexPlatform = 'win32-x64';
-const _codexSha256 =
-    '4fbd23473a2fc223396cdd8490d3f658d368438134c12a3f1dac9d1e2041a65b';
+const _codexIntegrity =
+    'sha512-urWPhwh9YavuoAPIkmVYKBTtd5OtGVL4Ki0Fb28dhK/Mz6Pt4LSy+gbRrZFz5+RXrw9ubvXuXDCcd8beYcWhDg==';
 
 /// Where that package is: the npm registry's own file for the platform.
 const _codexUrl =
@@ -578,7 +580,7 @@ Future<void> _putClaude(Directory root, Directory bundle) async {
 
 /// Puts the Codex CLI the bundle carries in `codex-cli\`: this platform's
 /// npm package, downloaded into build\codex\ once and checked against
-/// [_codexSha256] each time, then unpacked as it is — the program finds
+/// [_codexIntegrity] each time, then unpacked as it is — the program finds
 /// the resources it needs beside itself that way. The `VERSION` file names
 /// the build, as the app reads it to know what it carries.
 Future<void> _putCodex(Directory root, Directory bundle) async {
@@ -586,7 +588,7 @@ Future<void> _putCodex(Directory root, Directory bundle) async {
   final archive = File(
     '${cache.path}\\codex-$_codexVersion-$_codexPlatform.tgz',
   );
-  if (!archive.existsSync() || await _sha256Of(archive) != _codexSha256) {
+  if (!archive.existsSync() || await _integrityOf(archive) != _codexIntegrity) {
     final url = Uri.parse(_codexUrl);
     stdout.writeln('  Downloading $url');
     cache.createSync(recursive: true);
@@ -601,12 +603,13 @@ Future<void> _putCodex(Directory root, Directory bundle) async {
     } finally {
       client.close();
     }
-    if (await _sha256Of(part) != _codexSha256) {
+    if (await _integrityOf(part) != _codexIntegrity) {
       part.deleteSync();
       _fail(
         'The Codex download is not the one this script expects.\n'
         'After choosing another version, update _codexVersion and\n'
-        '_codexSha256 in this script.',
+        '_codexIntegrity in this script (tool/bump_codex_version.dart\n'
+        'does it).',
       );
     }
     part.renameSync(archive.path);
@@ -644,6 +647,13 @@ void _copyTree(Directory source, Directory target) {
 /// hundred megabytes does not have to fit in memory at once.
 Future<String> _sha256Of(File file) async =>
     '${await sha256.bind(file.openRead()).first}';
+
+/// The file's integrity as the npm registry says it (`sha512-<base64>`:
+/// its `dist.integrity`), read in pieces the same way.
+Future<String> _integrityOf(File file) async {
+  final digest = await sha512.bind(file.openRead()).first;
+  return 'sha512-${base64Encode(digest.bytes)}';
+}
 
 /// Clears CMake's cache when it was made for another product: it keeps the
 /// target's name, and a build of the other product fails on it ("No target

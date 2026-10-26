@@ -38,17 +38,22 @@
 - 包里放哪：`codex-cli\`（挨着 `baocode-codex.exe`），里面是平台 npm 包的原样布局
   `vendor\x86_64-pc-windows-msvc\{bin\codex.exe, codex-resources\, codex-path\}`——
   程序按相对位置找它自己的资源，布局不能改。
-- 谁放进去的：`tool/build_windows.dart` 的 `_putCodex()`。版本与 SHA-256 钉在脚本顶部
-  （`_codexVersion` / `_codexSha256`）：
+- 谁放进去的：`tool/build_windows.dart` 的 `_putCodex()`。版本与校验值钉在脚本顶部
+  （`_codexVersion` / `_codexIntegrity`）：
 
   ```dart
   const _codexVersion = '0.164.0';
   const _codexPlatform = 'win32-x64';
-  const _codexSha256 = '4fbd2347…41a65b';   // 这个平台包的 tgz
+  const _codexIntegrity = 'sha512-urWPhwh9…hDg==';   // registry 的 dist.integrity
   const _codexUrl = 'https://registry.npmjs.org/@openai/codex/-/codex-$_codexVersion-$_codexPlatform.tgz';
   ```
 
-  下载一次缓存在 `build\codex\`，以后离线构建也能用；换版本时改这三行。
+  下载一次缓存在 `build\codex\`，以后离线构建也能用；换版本时改这三行——
+  或者让工具改：`dart tool/bump_codex_version.dart`（说现状，落后时退出码 1）、
+  `--write`（写进去）。它读的是 npm registry 的 `dist.integrity`，**不用下载 165 MB**
+  就知道校验值；`.github/workflows/codex-version.yml` 每天跑一次并自动提交
+  `ci(codex): bump the Codex CLI to <版本>`，发版时的 `check` 再跑一遍兜底
+  （落后就发不下去）。
 - 应用怎么找到它：`ProcessCodexTransport.locateCodex()` 的顺序是
   **`BAOCODE_CODEX_COMMAND`（环境里指定的）→ 用户自己装的（PATH / npm 全局 / Codex Desktop）
   → 包里带的**。包里那份是「地板」：用户有自己的就用用户的（可能更新、已登录）。
