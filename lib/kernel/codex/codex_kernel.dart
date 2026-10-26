@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 
@@ -49,6 +50,9 @@ class CodexKernel
     _resumeAttempted = _context.resume == null;
     _work = _modeId(settings[KernelChoiceKind.mode.name]);
     _permission = _permissionId(settings[KernelChoiceKind.permission.name]);
+    // The model the software picked for this conversation: what the picker
+    // shows and what the turn asks for, until the user picks another.
+    _pickedModel = settings[KernelChoiceKind.model.name];
     _pickedEffort = settings[KernelChoiceKind.effort.name];
     _pickedTier = settings[KernelChoiceKind.fast.name];
     for (final MapEntry(:key, :value) in settings.entries) {
@@ -98,41 +102,20 @@ class CodexKernel
   /// Where it works: the project directory it is to run in.
   late final KernelContext _context;
 
+  /// What the model picker offers, read live: the list the server gave this
+  /// run, else the one it gave last time ([modelCache]), else the
+  /// stand-ins. Claude Code's kernel is built the same way ([_Choice] there
+  /// too): the picker asks the kernel each time it draws, so a list that
+  /// arrives late — the server is asked as the kernel is made, and answers
+  /// when it can — shows without anything having to be pushed at it.
   @override
-  late final LocalChoice model = LocalChoice(
-    [
-      // What the server listed last time first: the picker is right before
-      // the server has said anything this run.
-      ...?_keptModelsOrNull(),
-      ..._fallbackModels,
-      if (_context.settings[KernelChoiceKind.model.name] case final model?
-          when !_offered.any((option) => option.id == model))
-        KernelOption(
-          model,
-          model,
-          Icons.bolt_rounded,
-          'Chosen for this conversation',
-        ),
-    ],
-    onChanged: (_) {
-      _effortChanged();
-      _tierChanged();
-      emitInfoChanged();
-    },
-  )..reported = _context.settings[KernelChoiceKind.model.name];
+  late final KernelChoiceSource model = _CodexModelChoice(this);
 
   /// The models kept from the last run, when there are any.
   static List<KernelOption>? _keptModelsOrNull() {
     final kept = _keptModels();
     return kept.isEmpty ? null : kept;
   }
-
-  /// Every id the picker offers at the start: the kept ones and the
-  /// stand-ins.
-  static List<KernelOption> get _offered => [
-    ...?_keptModelsOrNull(),
-    ..._fallbackModels,
-  ];
 
   @override
   late final LocalChoice mode = LocalChoice(
@@ -166,6 +149,50 @@ class CodexKernel
   final Map<String, String> _tiersByModel = {};
   final Map<String, _ModelInfo> _models = {};
   bool _modelsLoaded = false;
+
+  /// The model picked in this conversation, as the server names it: what
+  /// the software passed in ([KernelContext.settings]) until the user picks
+  /// another. Null until either has said.
+  String? _pickedModel;
+
+  /// What the server listed this run, as the picker offers them: null until
+  /// it has answered (the kept ones and the stand-ins stand in until then).
+  List<KernelOption>? _listed;
+
+  /// What the picker offers now: what the server listed, else what it
+  /// listed last time, else the stand-ins — with the software's own pick
+  /// among them, so that a model this build does not know still shows.
+  List<KernelOption> get _modelOptions {
+    final options = _listed ?? [...?_keptModelsOrNull(), ..._fallbackModels];
+    final picked = _pickedModel;
+    if (picked == null || options.any((option) => option.id == picked)) {
+      return options;
+    }
+    // A model the server does not list — retired since, or named by a newer
+    // build than this one — still shows as what is in effect, rather than
+    // silently becoming another.
+    return [
+      ...options,
+      KernelOption(
+        picked,
+        picked,
+        Icons.bolt_rounded,
+        'Chosen for this conversation',
+      ),
+    ];
+  }
+
+  /// What is in effect: the pick, or the first offered when nothing is.
+  String? get _modelSelected => _pickedModel ?? _modelOptions.firstOrNull?.id;
+
+  /// Picks [id] for this conversation. The turn asks for it by name; the
+  /// effort and the service tier are the ones that model takes.
+  void _selectModel(String id) {
+    _pickedModel = id;
+    _effortChanged();
+    _tierChanged();
+    emitInfoChanged();
+  }
 
   @override
   KernelHealth get health => _health;
@@ -661,9 +688,9 @@ class CodexKernel
               'text': _planNote,
             },
         ],
-        'model': model.selected,
-        'effort': ?_effortFor(model.selected ?? ''),
-        'serviceTierForTurn': ?_tierFor(model.selected ?? ''),
+        'model': _modelSelected,
+        'effort': ?_effortFor(_modelSelected ?? ''),
+        'serviceTierForTurn': ?_tierFor(_modelSelected ?? ''),
         'approvalPolicy': readOnly
             ? 'never'
             : switch (_permission) {
@@ -738,8 +765,8 @@ class CodexKernel
 
   Map<String, Object?> _threadParameters() => {
     'cwd': _protocolCwd,
-    'model': model.selected,
-    'serviceTier': ?_tierFor(model.selected ?? ''),
+    'model': _modelSelected,
+    'serviceTier': ?_tierFor(_modelSelected ?? ''),
     'developerInstructions': ?_developerInstructions,
   };
 
@@ -777,7 +804,7 @@ class CodexKernel
     _threadId = thread['id'] as String;
     final reportedModel = result['model'] ?? thread['model'];
     if (reportedModel is String && reportedModel.isNotEmpty) {
-      model.reported = reportedModel;
+      _pickedModel = reportedModel;
     }
     final provider = result['modelProvider'] ?? thread['modelProvider'];
     if (provider is String && provider.isNotEmpty) {
@@ -787,11 +814,11 @@ class CodexKernel
         result['reasoningEffort'] ?? thread['reasoningEffort'];
     if (reportedEffort is String && reportedEffort.isNotEmpty) {
       _pickedEffort = reportedEffort;
-      _effortsByModel[model.selected ?? ''] = reportedEffort;
+      _effortsByModel[_modelSelected ?? ''] = reportedEffort;
     }
     if (result['serviceTier'] case final String tier when tier.isNotEmpty) {
       _pickedTier = tier;
-      _tiersByModel[model.selected ?? ''] = tier;
+      _tiersByModel[_modelSelected ?? ''] = tier;
     }
     final collaboration = result['collaborationMode'];
     if (collaboration is Map && collaboration['mode'] is String) {
@@ -899,16 +926,19 @@ class CodexKernel
     if (options.isEmpty) {
       throw const CodexRequestError('Codex listed no models');
     }
-    final was = model.selected;
-    final kept = options.where((option) => option.id == was).firstOrNull;
-    final preferred =
-        kept ??
+    _listed = options;
+    // Nothing picked yet (neither the software nor the user): the model the
+    // server calls its default is what is in effect. A pick already made
+    // stands, even when the server does not list that model — it may have
+    // retired it, or this build may be older than the name; the turn asks
+    // for it by name and the server answers for itself. Reported, not asked
+    // for: the picker shows what is in effect.
+    _pickedModel ??=
         options
             .where((option) => _models[option.id]?.isDefault == true)
-            .firstOrNull ??
-        options.first;
-    model.options = options;
-    model.reported = preferred.id;
+            .firstOrNull
+            ?.id ??
+        options.first.id;
     _modelsLoaded = true;
     // Kept for the next run: the picker is right before the server has said.
     _keepModels([
@@ -944,7 +974,7 @@ class CodexKernel
         ? value
         : null;
     return supported(_effortsByModel[modelId]) ??
-        (model.selected == modelId ? supported(_pickedEffort) : null) ??
+        (_modelSelected == modelId ? supported(_pickedEffort) : null) ??
         supported(_models[modelId]?.defaultEffort) ??
         available.firstOrNull?.id;
   }
@@ -953,7 +983,7 @@ class CodexKernel
       _models[modelId]?.efforts ?? const [];
 
   void _effortChanged() {
-    final selected = model.selected;
+    final selected = _modelSelected;
     if (selected == null) return;
     final available = _effortsFor(selected);
     if (available.isEmpty) return;
@@ -972,7 +1002,7 @@ class CodexKernel
         ? value
         : null;
     return supported(_tiersByModel[modelId]) ??
-        (model.selected == modelId ? supported(_pickedTier) : null) ??
+        (_modelSelected == modelId ? supported(_pickedTier) : null) ??
         supported(_models[modelId]?.defaultServiceTier);
   }
 
@@ -980,7 +1010,7 @@ class CodexKernel
       _models[modelId]?.serviceTiers ?? const [];
 
   void _tierChanged() {
-    final selected = model.selected;
+    final selected = _modelSelected;
     if (selected == null) return;
     final available = _tiersFor(selected);
     if (available.isEmpty) return;
@@ -2070,18 +2100,18 @@ class CodexKernel
 
   void _applyThreadSettings(Map<String, Object?> settings) {
     if (settings['model'] case final String value when value.isNotEmpty) {
-      model.reported = value;
+      _pickedModel = value;
     }
     if (settings['modelProvider'] case final String provider) {
       _modelProvider = provider;
     }
     if (settings['effort'] case final String value when value.isNotEmpty) {
       _pickedEffort = value;
-      _effortsByModel[model.selected ?? ''] = value;
+      _effortsByModel[_modelSelected ?? ''] = value;
     }
     if (settings['serviceTier'] case final String value when value.isNotEmpty) {
       _pickedTier = value;
-      _tiersByModel[model.selected ?? ''] = value;
+      _tiersByModel[_modelSelected ?? ''] = value;
     }
     if (settings['collaborationMode'] case final Map collaboration) {
       if (collaboration['mode'] case final String value) {
@@ -3010,14 +3040,14 @@ class _CodexModelSetting implements ModelSetting {
   List<KernelOption> optionsFor(String model) => kernel._effortsFor(model);
 
   @override
-  String? get selected => kernel._effortFor(kernel.model.selected ?? '');
+  String? get selected => kernel._effortFor(kernel._modelSelected ?? '');
 
   @override
   String? selectedFor(String model) => kernel._effortFor(model);
 
   @override
   void select(String model, String id) {
-    if (kernel.model.selected != model) kernel.model.reported = model;
+    if (kernel._modelSelected != model) kernel._pickedModel = model;
     kernel._pickedEffort = id;
     kernel._effortsByModel[model] = id;
     kernel.emitInfoChanged();
@@ -3036,14 +3066,14 @@ class _CodexServiceTierSetting implements ModelSetting {
   List<KernelOption> optionsFor(String model) => kernel._tiersFor(model);
 
   @override
-  String? get selected => kernel._tierFor(kernel.model.selected ?? '');
+  String? get selected => kernel._tierFor(kernel._modelSelected ?? '');
 
   @override
   String? selectedFor(String model) => kernel._tierFor(model);
 
   @override
   void select(String model, String id) {
-    if (kernel.model.selected != model) kernel.model.reported = model;
+    if (kernel._modelSelected != model) kernel._pickedModel = model;
     kernel._pickedTier = id;
     kernel._tiersByModel[model] = id;
     kernel.emitInfoChanged();
@@ -3133,5 +3163,37 @@ class _ElicitationField {
       'number' => num.tryParse(value) ?? value,
       _ => value,
     };
+  }
+}
+
+/// The models the picker offers, read live: the list the server gave this
+/// run ([_listed]), else the one it gave last time, else the stand-ins.
+///
+/// Claude Code's kernel builds its choice the same way: the picker asks each
+/// time it draws, so a list that arrives after the kernel was made shows
+/// without anything being pushed at it, and the one the software passed in
+/// ([KernelContext.settings]) is what is in effect until the user picks.
+class _CodexModelChoice implements KernelChoiceSource {
+  _CodexModelChoice(this._kernel);
+
+  final CodexKernel _kernel;
+
+  List<KernelOption> _cache = const [];
+
+  /// The same list while unchanged, so pickers keep their identity.
+  @override
+  List<KernelOption> get options {
+    final fresh = _kernel._modelOptions;
+    if (!listEquals(fresh, _cache)) _cache = fresh;
+    return _cache;
+  }
+
+  @override
+  String? get selected => _kernel._modelSelected;
+
+  @override
+  void select(String id) {
+    if (id == selected) return;
+    _kernel._selectModel(id);
   }
 }

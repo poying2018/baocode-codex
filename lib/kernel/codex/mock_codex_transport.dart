@@ -121,6 +121,20 @@ class MockCodexTransport implements CodexTransport {
               ],
               'serviceTiers': <Object?>[],
             },
+            {
+              'id': 'gpt-5.5',
+              'displayName': 'GPT-5.5',
+              'description': 'Legacy coding model.',
+              'defaultReasoningEffort': 'medium',
+              'isDefault': false,
+              'inputModalities': ['text', 'image'],
+              'supportedReasoningEfforts': [
+                {'reasoningEffort': 'low', 'description': ''},
+                {'reasoningEffort': 'medium', 'description': ''},
+                {'reasoningEffort': 'high', 'description': ''},
+              ],
+              'serviceTiers': <Object?>[],
+            },
           ],
         });
       case 'mcpServerStatus/list':
