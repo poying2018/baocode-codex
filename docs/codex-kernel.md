@@ -76,6 +76,7 @@ CLI 输出
 | `codex_transport.dart` | Adaptee 契约 + 启动参数 | `CodexTransport`(L4)、`CodexLaunch`(L47)、`CodexUnavailable`、`CodexRequestError` |
 | `codex_transport_factory.dart` | 传输的共享与启动时机 | `CodexTransportFactory`(L16)：`of(context)`(L54)、`stopAll()`(L37)、`_home()`(L78)、`_seed()`(L83) |
 | `codex_process_transport_io.dart` | 本机子进程 | `ProcessCodexTransport`(L11)：`start`(L46)、`_line`(L308)、`_endTree`(L414)；`locateCodex()`(L119) |
+| `codex_bundle.dart` | **应用自带的那份 Codex** 在哪（纯 Dart：构建工具也用它） | `CodexBundle`：`folder`、`find()`、`version()` |
 | `remote_codex.dart` | 远端主机的同一个服务器 | `startRemoteCodex`(L12)、`RemoteCodexTransport`(L47) |
 | `mock_codex_transport.dart` | 按真实报文的假传输 | `MockCodexTransport`(L10) |
 
@@ -276,6 +277,7 @@ _receive`（`codex_kernel.dart:1719`）分派：
 | 新的交互（提问/审批/表单） | `_serverRequest` 加分支 → `InteractionRequested` → `answer()` 加回写分支 |
 | 服务端要审批的新东西 | `_serverRequest` 加分支 + `answer()` 的回写形状 |
 | 换一个 Codex 来跑 | 环境变量 `BAOCODE_CODEX_COMMAND`（`codex_process_transport_io.dart:139`）：一行命令，如 `dart F:\path\tool\codex_stub.dart` |
+| 应用自带的 Codex 在哪 | `codex_bundle.dart`（`codex-cli/` 在应用旁边）；顺序是 **`BAOCODE_CODEX_COMMAND` → 用户自己装的 → 包里带的**（包里那份是地板） |
 | 换个产品的身份 | `packages/bao_remote/lib/src/platform/product.dart`（一处） |
 
 ---
