@@ -23,15 +23,16 @@ on:
       product:
         description: The product the server is for
         type: choice
-        default: baocode-claude
-        options: [baocode-claude, baocode-codex]
+        default: baocode-codex
+        options: [baocode-codex, baocode-claude]
   workflow_call:
     inputs:
       product:
-        description: The product the server is for
-        type: choice
-        default: baocode-claude
-        options: [baocode-claude, baocode-codex]
+        # A string, not a choice: workflow_call takes no choice inputs — a
+        # choice makes the whole file invalid, and every run of it fails.
+        description: The product the server is for (baocode-codex, baocode-claude)
+        type: string
+        default: baocode-codex
 
 permissions:
   contents: read
