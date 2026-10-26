@@ -190,7 +190,13 @@ Future<void> main(List<String> arguments) async {
   // between versions (an upgrade installs over the old one) and must differ
   // between the products (so that one does not install over the other).
   // The codex product's is a new one of its own.
-  final productId = spec.appId;
+  //
+  // Inno Setup reads `{…}` in a value as a constant of its own, so a
+  // literal brace is written twice there — and `{#…}` is the
+  // preprocessor's, so a single one is an unknown constant and the build
+  // stops. The table keeps the AppId as Windows means it; this is where
+  // its opening brace is doubled.
+  final productId = '{{${spec.appId.substring(1)}';
   // The context menu's key, the URL scheme and the browsers' native
   // messaging host: each product has one of its own, so that one does not
   // take the other's away.
