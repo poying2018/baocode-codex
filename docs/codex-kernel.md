@@ -2,7 +2,10 @@
 
 面向在 BaoCode Codex 上开发的读本。代码位置 `lib/kernel/codex/`，共享框架在
 `lib/kernel/`，产品身份在 `packages/bao_remote/lib/src/platform/product.dart`。
-行号对应当前分支 `feature/codex-kernel`，改动后请自行校正。
+行号对应当前分支 `codex-product`，改动后请自行校正。
+
+这个仓库**只做 codex 那个产品**（见 `docs/codex-project.md`）：它从
+`F:\Projects\baocode`（BaoCode Claude）分出来，自己的分支、自己的构建目录。
 
 先读这一段，能省掉后面很多摸索：
 
@@ -347,6 +350,18 @@ flutter test test/codex_live_test.dart             # 对着真的 Codex（CODEX_
 
 `codex_kernel.dart` 2860 行承担生命周期、选项、权限、配额、MCP、目标、历史、回放
 十类职责；协议的类型是散落各处的裸字符串，**没有集中的常量表**——改协议要全局搜索。
+
+### 8.7 这个产品不碰另一个产品的家
+
+两个产品各自有 agent 的文件夹：Claude Code 的是 `~/.claude`（或设置里的路径），
+Codex 的是数据目录下的 `codex/`（会话、技能、登录都在这里）。
+**给 agent 装技能（如 Stash 的 `baocode-stash`）要写进本产品的 agent 文件夹**：
+`lib/stash/stash_io.dart::agentSkillsDir()` 按产品分（codex 产品写
+`<数据目录>/codex/skills/`）。曾经它写进了 `~/.claude`——codex 产品把技能塞进了
+**另一个产品**的家（在那个目录不可写时还会留下一个未处理的异常）。
+
+同理，产品自己的数据（Stash 的文件夹、钥匙串、`code` 命令的目录、注册表键、
+日志目录）都从 `product.dart` 那一张表来，**不要**在代码里写死另一个产品的名字或路径。
 
 ---
 
