@@ -10,6 +10,7 @@ import '../../remote/remote_location.dart';
 import '../../remote/ssh_host.dart';
 import 'codex_transport.dart';
 import 'codex_process_transport.dart';
+import 'codex_upstream.dart';
 
 /// The transport a Codex kernel talks over: the app-server as a local
 /// process.
@@ -51,7 +52,15 @@ abstract final class CodexTransportFactory {
   }
 
   /// The transport for a kernel that works in [context]'s directory.
-  static CodexTransport of(KernelContext context) {
+  ///
+  /// [upstream] is the user's own upstream (Settings → Models) the session
+  /// runs on, when it runs on one: the server is started for it, with its
+  /// endpoint and key, and kept apart from the one OpenAI's models are
+  /// served from — a process is one upstream.
+  static CodexTransport of(
+    KernelContext context, {
+    CodexUpstream? upstream,
+  }) {
     final cwd = context.cwd ?? Directory.current.path;
     if (RemoteLocation.hostOf(cwd) case final host?) {
       return _shared.putIfAbsent(
@@ -64,10 +73,14 @@ abstract final class CodexTransportFactory {
     }
     final home = _home();
     _seed(home);
+    // One process per upstream: its configuration is fixed when it starts.
+    final key = upstream == null ? home : '$home#${upstream.id}';
     return _shared.putIfAbsent(
-      home,
+      key,
       () => _StartingCodexTransport(
-        () => startCodexProcess(CodexLaunch(cwd: cwd, home: home)),
+        () => startCodexProcess(
+          launchOn(CodexLaunch(cwd: cwd, home: home), upstream),
+        ),
       ),
     );
   }

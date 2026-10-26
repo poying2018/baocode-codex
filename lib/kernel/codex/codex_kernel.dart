@@ -10,11 +10,16 @@ import 'package:path/path.dart' as p;
 import '../../chat/chat_models.dart';
 import '../../workspace/editor_launcher.dart' show openExternal;
 import '../../remote/remote_location.dart';
+import '../../models/model_provider.dart';
+import '../../models/model_providers.dart';
+import '../../models/model_runtime.dart';
 import '../../settings/user_settings.dart';
 import '../agent_kernel.dart';
 import '../kernel_event.dart';
 import '../kernel_types.dart';
 import 'codex_transport.dart';
+import 'codex_transport_factory.dart';
+import 'codex_upstream.dart';
 
 /// Adapts `codex app-server` to [AgentKernel]. Codex keeps no background
 /// commands and cannot put files back, so it does not declare
@@ -96,7 +101,11 @@ class CodexKernel
 
   @override
   final KernelDescriptor descriptor;
-  final CodexTransport _transport;
+  /// The transport it talks over. One of the user's own upstreams is not
+  /// the server's to serve — a process is one upstream — so the transport
+  /// the kernel was made with is replaced by one started for that upstream
+  /// when the first turn asks for it (see [_restartOn]).
+  CodexTransport _transport;
   late final StreamSubscription<Map<String, Object?>> _subscription;
 
   /// Where it works: the project directory it is to run in.
@@ -159,26 +168,61 @@ class CodexKernel
   /// it has answered (the kept ones and the stand-ins stand in until then).
   List<KernelOption>? _listed;
 
+  /// The upstream the server runs on, when it is one of the user's own
+  /// (Settings → Models) rather than OpenAI's: given at start, so picking
+  /// another is a restart on it.
+  CodexUpstream? _upstream;
+
+  /// The upstreams the picker offers, as Settings → Models has them: the
+  /// server lists only OpenAI's models, so the user's are offered beside
+  /// them, picked as `@<provider>/<model>`.
+  ModelProviders? get _providers => ModelProviders.current;
+
   /// What the picker offers now: what the server listed, else what it
   /// listed last time, else the stand-ins — with the software's own pick
   /// among them, so that a model this build does not know still shows.
   List<KernelOption> get _modelOptions {
     final options = _listed ?? [...?_keptModelsOrNull(), ..._fallbackModels];
     final picked = _pickedModel;
-    if (picked == null || options.any((option) => option.id == picked)) {
-      return options;
-    }
-    // A model the server does not list — retired since, or named by a newer
-    // build than this one — still shows as what is in effect, rather than
-    // silently becoming another.
+    final known = picked != null && options.any((option) => option.id == picked);
     return [
       ...options,
-      KernelOption(
-        picked,
-        picked,
-        Icons.bolt_rounded,
-        'Chosen for this conversation',
-      ),
+      // A model the server does not list — retired since, or named by a
+      // newer build than this one — still shows as what is in effect,
+      // rather than silently becoming another.
+      if (picked != null && !known)
+        KernelOption(
+          picked,
+          picked,
+          Icons.bolt_rounded,
+          'Chosen for this conversation',
+        ),
+      // The user's own upstreams, after the server's models: picking one
+      // starts the server on it.
+      ..._myUpstreamModels(),
+    ];
+  }
+
+  /// The models of the user's own upstreams (Settings → Models), each
+  /// grouped under the upstream it belongs to. Picking one is a restart on
+  /// that upstream: the server is started for it.
+  List<KernelOption> _myUpstreamModels() {
+    final providers = _providers;
+    if (providers == null) return const [];
+    return [
+      for (final provider in providers.enabled)
+        for (final info in provider.enabledModels)
+          KernelOption(
+            modelRef(provider.id, info.id),
+            info.displayName,
+            Icons.hub_outlined,
+            info.id,
+            group: KernelOptionGroup(
+              provider.id,
+              provider.name,
+              warning: providers.error(provider.id),
+            ),
+          ),
     ];
   }
 
@@ -187,11 +231,45 @@ class CodexKernel
 
   /// Picks [id] for this conversation. The turn asks for it by name; the
   /// effort and the service tier are the ones that model takes.
+  ///
+  /// One of the user's own upstreams ([modelRef]) is not the server's to
+  /// serve: the next turn starts the server on it ([_prepareUpstream]), so
+  /// the pick takes effect from that turn on.
   void _selectModel(String id) {
     _pickedModel = id;
     _effortChanged();
     _tierChanged();
     emitInfoChanged();
+  }
+
+  /// Makes [_transport] the one the picked model needs: the server's own
+  /// when the model is one it serves, else one started on the user's
+  /// upstream. Nothing to do when it already is that one.
+  Future<void> _prepareUpstream() async {
+    final providers = _providers;
+    final ref = _pickedModel;
+    CodexUpstream? wanted;
+    if (providers != null && parseModelRef(ref) != null) {
+      try {
+        wanted = await codexUpstreamOf(providers, ref, endpoint: proxyEndpoint);
+      } on Object catch (error) {
+        _failed('The upstream could not be set up', '$error');
+        rethrow;
+      }
+    }
+    if (wanted?.id == _upstream?.id) return;
+    _upstream = wanted;
+    _listed = null;
+    _modelsLoaded = false;
+    final fresh = CodexTransportFactory.of(_context, upstream: wanted);
+    if (identical(fresh, _transport)) return;
+    await _subscription.cancel();
+    _transport = fresh;
+    _subscription = _transport.messages.listen(
+      _receive,
+      onError: _streamError,
+      onDone: _streamDone,
+    );
   }
 
   @override
@@ -609,6 +687,10 @@ class CodexKernel
         return;
       }
       await _history;
+      // The upstream the model needs, before the server is asked anything:
+      // one of the user's own is not the server's to serve, and a process
+      // is one upstream.
+      await _prepareUpstream();
       await _initialize();
       await _ensureThread();
       final readOnly = _work == 'ask' || _work == 'plan';

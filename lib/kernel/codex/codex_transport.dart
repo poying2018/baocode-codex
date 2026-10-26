@@ -36,6 +36,7 @@ class CodexLaunch {
     this.model,
     this.environment,
     this.home,
+    this.overrides = const {},
   });
 
   /// The project directory it works in.
@@ -52,8 +53,22 @@ class CodexLaunch {
   /// server cannot start at all while it does.
   final String? home;
 
+  /// Configuration set on the command line (`-c key=value`), over what
+  /// `config.toml` says: an upstream of the user's own
+  /// (`model_providers.<id>`), and the model it serves.
+  final Map<String, String> overrides;
+
   /// The arguments `codex app-server` is started with.
-  List<String> get arguments => const ['app-server', '--stdio'];
+  List<String> get arguments => [
+    'app-server',
+    '--stdio',
+    // One `-c` for each: the key, then its value as TOML.
+    for (final MapEntry(:key, :value) in overrides.entries) ...[
+      '--config',
+      '$key=$value',
+    ],
+    if (model case final model?) ...['--model', model],
+  ];
 }
 
 /// A request the server refused: its error, said.

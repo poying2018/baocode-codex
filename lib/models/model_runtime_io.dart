@@ -181,6 +181,11 @@ Future<Map<String, String>> providerLaunchEnvironment(
   );
 }
 
+/// Where the app's proxy takes [providerId]'s requests, and the token it
+/// asks for.
+Future<ProxyEndpoint> proxyEndpoint(String providerId) =>
+    _proxy.endpoint(providerId);
+
 Future<void> stopModelProxy() async {
   _codex.close();
   await _proxy.close();
