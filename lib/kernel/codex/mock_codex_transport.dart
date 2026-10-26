@@ -101,12 +101,16 @@ class MockCodexTransport implements CodexTransport {
       case 'thread/turns/list':
         _respond(id, {'data': <Object?>[], 'nextCursor': null});
       case 'model/list':
+        // What the real server lists, in its shape: the stand-ins the kernel
+        // carries are only for before this answer arrives, so the mock says
+        // real ids — a made-up one would be refused by the real server.
         _respond(id, {
           'data': [
             {
-              'id': 'gpt-5.5-codex',
-              'displayName': 'GPT-5.5 Codex',
-              'description': 'Tuned for coding',
+              'id': 'gpt-6.1-sol',
+              'displayName': 'GPT-6.1-Sol',
+              'description': 'Our latest Sol is more intelligent and more '
+                  'efficient',
               'defaultReasoningEffort': 'medium',
               'isDefault': true,
               'inputModalities': ['text', 'image'],

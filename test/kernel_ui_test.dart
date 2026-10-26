@@ -337,7 +337,15 @@ void main() {
     final thread = workspace.selected;
     expect(thread.kernel, MockKernels.codex);
     expect(picker('Codex'), findsOneWidget);
-    expect(picker('GPT-5.5 Codex'), findsOneWidget);
+    // The models the server lists: its default first, the effort it is set
+    // to beside it.
+    expect(
+      find.descendant(
+        of: find.byType(ComposerPicker),
+        matching: find.textContaining('GPT-6.1-Sol'),
+      ),
+      findsOneWidget,
+    );
 
     // Codex has Plan as its own collaboration mode.
     await tester.tap(picker('Agent'));

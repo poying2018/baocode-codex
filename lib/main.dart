@@ -45,6 +45,7 @@ import 'kernel/claude_code/claude_core_setting.dart';
 import 'kernel/claude_code/claude_onboarding.dart';
 import 'kernel/claude_code/claude_path_setting.dart';
 import 'kernel/claude_code/process_transport.dart';
+import 'kernel/codex/codex_kernel.dart';
 import 'kernel/codex/codex_transport_factory.dart';
 import 'kernel/claude_code/turn_stats_stub.dart'
     if (dart.library.io) 'kernel/claude_code/turn_stats_io.dart'
@@ -238,6 +239,9 @@ Future<void> main(List<String> arguments) async {
       // Claude Code's own models as it last listed them: in the picker
       // before a session on them starts.
       ClaudeCodeKernel.modelCache = files.storage;
+      // The Codex server's models, likewise: the server starts for the first
+      // message, so the picker would otherwise show a guess.
+      CodexKernel.modelCache = files.storage;
     }
     // Settings → Models: the upstreams, kept in settings.json.
     ModelProviders.current = ModelProviders.settings(files.settings);

@@ -9,6 +9,7 @@ import 'package:path/path.dart' as p;
 import '../../chat/chat_models.dart';
 import '../../workspace/editor_launcher.dart' show openExternal;
 import '../../remote/remote_location.dart';
+import '../../settings/user_settings.dart';
 import '../agent_kernel.dart';
 import '../kernel_event.dart';
 import '../kernel_types.dart';
@@ -75,6 +76,18 @@ class CodexKernel
       _history = _readInitialHistory(session);
     }
     _live.add(this);
+    // The models, as soon as the server can say: the picker is what the
+    // user reaches for before the first message, and until this answer it
+    // shows what the last run kept. Asked after the constructor returns, so
+    // that the choice the answer fills in exists. Failing is not a failure
+    // of the session: the first turn asks again and says so if it cannot.
+    scheduleMicrotask(() {
+      unawaited(
+        _loadModels().catchError((Object error) {
+          debugPrint('codex: the models were not listed: $error');
+        }),
+      );
+    });
   }
 
   @override
@@ -88,9 +101,12 @@ class CodexKernel
   @override
   late final LocalChoice model = LocalChoice(
     [
+      // What the server listed last time first: the picker is right before
+      // the server has said anything this run.
+      ...?_keptModelsOrNull(),
       ..._fallbackModels,
       if (_context.settings[KernelChoiceKind.model.name] case final model?
-          when !_fallbackModels.any((option) => option.id == model))
+          when !_offered.any((option) => option.id == model))
         KernelOption(
           model,
           model,
@@ -104,6 +120,19 @@ class CodexKernel
       emitInfoChanged();
     },
   )..reported = _context.settings[KernelChoiceKind.model.name];
+
+  /// The models kept from the last run, when there are any.
+  static List<KernelOption>? _keptModelsOrNull() {
+    final kept = _keptModels();
+    return kept.isEmpty ? null : kept;
+  }
+
+  /// Every id the picker offers at the start: the kept ones and the
+  /// stand-ins.
+  static List<KernelOption> get _offered => [
+    ...?_keptModelsOrNull(),
+    ..._fallbackModels,
+  ];
 
   @override
   late final LocalChoice mode = LocalChoice(
@@ -224,15 +253,56 @@ class CodexKernel
   }
 
   /// What the model picker offers until the server says what it has.
+  ///
+  /// The one it gave last time comes first ([modelCache]): a server that is
+  /// not started yet — it starts for the first message, not for the picker —
+  /// would otherwise offer [_fallbackModels], which is a guess. The list the
+  /// server gives replaces it as soon as it answers.
+  static List<KernelOption> _keptModels() => [
+    for (final raw in modelCache?.get<List<Object?>>(modelCacheKey) ?? const [])
+      if (raw is Map && raw['id'] is String)
+        KernelOption(
+          raw['id'] as String,
+          raw['label'] as String? ?? raw['id'] as String,
+          Icons.bolt_rounded,
+          raw['description'] as String? ?? '',
+        ),
+  ];
+
+  /// Where the models the server listed are kept between runs (main.dart
+  /// sets it), so that the picker is right before the server has said.
+  static GlobalStorage? modelCache;
+
+  static const modelCacheKey = 'codex.models';
+
+  /// Keeps the models the server listed, when they changed.
+  static void _keepModels(List<Map<String, Object?>> models) {
+    final storage = modelCache;
+    if (storage == null) return;
+    final kept = storage.get<List<Object?>>(modelCacheKey);
+    if (kept != null && jsonEncode(kept) == jsonEncode(models)) return;
+    unawaited(
+      storage
+          .set(modelCacheKey, models)
+          .catchError(
+            (Object error) => debugPrint('$modelCacheKey not kept: $error'),
+          ),
+    );
+  }
+
+  /// What the picker offers when neither the server nor [modelCache] has
+  /// said anything. The ids are ones the server has been known to answer to:
+  /// a made-up one is refused when a turn asks for it, which reads as the
+  /// model being broken rather than the list being old.
   static const _fallbackModels = [
     KernelOption(
-      'gpt-5.5-codex',
-      'GPT-5.5 Codex',
+      'gpt-6.1-sol',
+      'GPT-6.1-Sol',
       Icons.bolt_rounded,
-      'Tuned for coding',
+      'The default: latest, for complex tasks',
     ),
-    KernelOption('gpt-5.5', 'GPT-5.5', Icons.bolt_rounded, 'General purpose'),
-    KernelOption('gpt-5.5-mini', 'GPT-5.5 mini', Icons.bolt_rounded, 'Fastest'),
+    KernelOption('gpt-6-sol', 'GPT-6-Sol', Icons.bolt_rounded, 'Coding'),
+    KernelOption('gpt-5.5', 'GPT-5.5', Icons.bolt_rounded, 'Legacy coding model'),
   ];
 
   /// Modes are its approval and sandbox policies.
@@ -840,6 +910,15 @@ class CodexKernel
     model.options = options;
     model.reported = preferred.id;
     _modelsLoaded = true;
+    // Kept for the next run: the picker is right before the server has said.
+    _keepModels([
+      for (final option in options)
+        {
+          'id': option.id,
+          'label': option.label,
+          'description': option.description,
+        },
+    ]);
     emitInfoChanged();
   }
 
