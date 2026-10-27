@@ -159,20 +159,17 @@ Future<void> main(List<String> arguments) async {
   final stockEngine = arguments.contains('--stock-engine');
   final channel = arguments.contains('--channel');
 
-  // Which product this build is: BaoCode Claude (the Claude Code one) or
-  // the codex one, whose executable is baocode-codex.exe. The product names
-  // the executable, and so the folder its data goes in, the window it has
-  // and the registration Windows keeps for it: the two install side by side
-  // and neither disturbs the other.
+  // Which product this build is: BaoCode Codex in this repository,
+  // or BaoCode Claude when asked for.
   //
-  //   dart run tool/build_windows.dart --product codex
+  //   dart run tool/build_windows.dart
   final productAt = arguments.indexOf('--product');
   final product = productAt < 0
-      ? 'baocode'
+      ? 'codex'
       : productAt + 1 < arguments.length &&
             !arguments[productAt + 1].startsWith('--')
       ? arguments[productAt + 1]
-      : 'baocode';
+      : 'codex';
   final spec = Product.byId(product);
   if (spec == null) {
     _fail(
