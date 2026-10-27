@@ -78,8 +78,19 @@ $env:LOCALAPPDATA='F:\Projects\tmp\localappdata'
 $env:TEMP='F:\Projects\tmp'; $env:TMP='F:\Projects\tmp'
 $env:ANDROID_HOME='F:\Projects\tmp\android-sdk'   # 有这个目录，flutter 才不去 where aapt
 $env:NO_PROXY='*'
-cd F:\Projects\baocode-codex
+cd F:\Projects\baocode-codex-dev
 ```
+
+- **代理是分裂的，别一起设**：pub.dev 直连通、走 Clash 代理反而连不上；GitHub 正好相反
+  （直连超时，走 `http://127.0.0.1:7897` 才通）。`NO_PROXY='*'` 只在 flutter 工具链那套里用；
+  碰到要拉 GitHub（`check_update_chain.dart`、构建里下载）时换成
+  `$env:HTTP_PROXY='http://127.0.0.1:7897'; $env:HTTPS_PROXY='http://127.0.0.1:7897'`，
+  **不要与 `NO_PROXY` 并存**。验证命令见 §「本机限制」。
+- **开发目录**：`F:\Projects\baocode-codex-dev`（`git worktree`，分支 `codex-dev`，与
+  `baocode-codex` 共享 `.git`）。BaoCode Claude 的会话只写 `F:\Projects\baocode`，两边互不干扰；
+  `baocode-codex`（main）留作交付/发版位。worktree 首次要 `flutter pub get`；`build\codex\`
+  （Codex CLI 的 tgz 缓存）、`build\remote\`、`build\openssh\` 可以从主目录复制过来，
+  免掉重新下载。
 
 - **构建**：`build_codex.cmd`（先 `tool/set_product.dart codex`，再 `flutter build windows --release`）。
   产物在 `build\windows\x64\runner\Release\baocode-codex.exe`。
