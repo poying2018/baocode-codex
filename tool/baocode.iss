@@ -312,8 +312,16 @@ function CloseHandle(hObject: THandle): BOOL;
 // user's own token — loses those and keeps the program, rather than the
 // installation rolling back on the first one it cannot write and leaving
 // nothing installed at all, which is what it did before this was asked.
+//
+// Asked lazily, the first time a [Check] wants an answer, and cached: Setup
+// calls a check function for every entry that names it, several times over.
+// Not in InitializeSetup, which the uninstaller never runs, and the same
+// checks gate the uninstall's deletions: an answer taken from a variable the
+// uninstall never set would say no and leave the menu and the scheme behind.
 var
+  MenuAsked: Boolean;
   MenuWritable: Boolean;
+  ClassesAsked: Boolean;
   ClassesWritable: Boolean;
 
 /// Whether [Dir] can be made: made here, as Setup would make it.
@@ -344,15 +352,44 @@ begin
 end;
 
 /// The Start Menu's, as [Check] wants it: a function, not a value.
+///
+/// The uninstall answers yes without probing: what the install wrote is the
+/// uninstall's to take away, whether or not the place can still be written.
 function MenuAllowed: Boolean;
 begin
-  Result := MenuWritable;
+  if IsUninstaller then
+    Result := True
+  else
+  begin
+    if not MenuAsked then
+    begin
+      MenuWritable := ProbeDir(ExpandConstant('{group}'));
+      MenuAsked := True;
+      if not MenuWritable then
+        Log('The Start Menu folder cannot be written: its shortcuts are ' +
+            'skipped');
+    end;
+    Result := MenuWritable;
+  end;
 end;
 
-/// Software\Classes', as [Check] wants it.
+/// Software\Classes, as [Check] wants it, asked the same way.
 function ClassesAllowed: Boolean;
 begin
-  Result := ClassesWritable;
+  if IsUninstaller then
+    Result := True
+  else
+  begin
+    if not ClassesAsked then
+    begin
+      ClassesWritable := ProbeClasses;
+      ClassesAsked := True;
+      if not ClassesWritable then
+        Log('Software\Classes cannot be written: the context menu and the ' +
+            'URL scheme are skipped');
+    end;
+    Result := ClassesWritable;
+  end;
 end;
 
 // An update the app runs (lib/update/installer_io.dart) starts Setup as the
@@ -366,15 +403,6 @@ var
   App: THandle;
 begin
   Result := True;
-  // Asked before anything is written: what cannot be written is skipped
-  // rather than aborted on, so that the program itself still goes in.
-  MenuWritable := ProbeDir(ExpandConstant('{group}'));
-  ClassesWritable := ProbeClasses;
-  if not MenuWritable then
-    Log('The Start Menu folder cannot be written: its shortcuts are skipped');
-  if not ClassesWritable then
-    Log('Software\Classes cannot be written: the context menu and the ' +
-        'URL scheme are skipped');
   Pid := StrToIntDef(ExpandConstant('{param:WAITPID|0}'), 0);
   if Pid <= 0 then
     Exit;
