@@ -142,9 +142,9 @@ Source: "{#BundleDir}\*"; DestDir: "{app}"; \
   Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\{#ProductName}"; Filename: "{app}\{#ProductExe}"
-Name: "{group}\{cm:UninstallProgram,{#ProductName}}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#ProductName}"; Filename: "{app}\{#ProductExe}"; Tasks: desktopicon
+Name: "{group}\{#ProductName}"; Filename: "{app}\{#ProductExe}"; Check: MenuAllowed
+Name: "{group}\{cm:UninstallProgram,{#ProductName}}"; Filename: "{uninstallexe}"; Check: MenuAllowed
+Name: "{autodesktop}\{#ProductName}"; Filename: "{app}\{#ProductExe}"; Tasks: desktopicon; Check: MenuAllowed
 
 [Registry]
 ; Only when asked for. Which hive follows the install mode: a per-machine
@@ -168,60 +168,60 @@ Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "Path"; \
 ; (lib/platform/context_menu_io.dart), for the user alone.
 Root: HKA; Subkey: "Software\Classes\*\shell\{#ProductKey}"; ValueType: string; \
   ValueName: ""; ValueData: "{code:MenuLabel|{#ProductName}}"; Tasks: contextmenu; \
-  Flags: uninsdeletekey
+  Flags: uninsdeletekey; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\*\shell\{#ProductKey}"; ValueType: string; \
-  ValueName: "Icon"; ValueData: """{app}\{#ProductExe}"""; Tasks: contextmenu
+  ValueName: "Icon"; ValueData: """{app}\{#ProductExe}"""; Tasks: contextmenu; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\*\shell\{#ProductKey}\command"; \
   ValueType: string; ValueName: ""; \
-  ValueData: """{app}\{#ProductExe}"" --baocode-agent ""%1"""; Tasks: contextmenu
+  ValueData: """{app}\{#ProductExe}"" --baocode-agent ""%1"""; Tasks: contextmenu; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\shell\{#ProductKey}"; \
   ValueType: string; ValueName: ""; ValueData: "{code:MenuLabel|{#ProductName}}"; \
-  Tasks: contextmenu; Flags: uninsdeletekey
+  Tasks: contextmenu; Flags: uninsdeletekey; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\shell\{#ProductKey}"; \
   ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#ProductExe}"""; \
-  Tasks: contextmenu
+  Tasks: contextmenu; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\shell\{#ProductKey}\command"; \
   ValueType: string; ValueName: ""; \
-  ValueData: """{app}\{#ProductExe}"" --baocode-agent ""%V"""; Tasks: contextmenu
+  ValueData: """{app}\{#ProductExe}"" --baocode-agent ""%V"""; Tasks: contextmenu; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\{#ProductKey}"; \
   ValueType: string; ValueName: ""; ValueData: "{code:MenuLabel|{#ProductName}}"; \
-  Tasks: contextmenu; Flags: uninsdeletekey
+  Tasks: contextmenu; Flags: uninsdeletekey; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\{#ProductKey}"; \
   ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#ProductExe}"""; \
-  Tasks: contextmenu
+  Tasks: contextmenu; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\{#ProductKey}\command"; \
   ValueType: string; ValueName: ""; \
-  ValueData: """{app}\{#ProductExe}"" --baocode-agent ""%V"""; Tasks: contextmenu
+  ValueData: """{app}\{#ProductExe}"" --baocode-agent ""%V"""; Tasks: contextmenu; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\*\shell\{#ProductKey}FastIde"; \
   ValueType: string; ValueName: ""; ValueData: "{code:MenuLabel|Fast Ide}"; \
-  Tasks: contextmenu; Flags: uninsdeletekey
+  Tasks: contextmenu; Flags: uninsdeletekey; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\*\shell\{#ProductKey}FastIde"; \
   ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#ProductExe}"""; \
-  Tasks: contextmenu
+  Tasks: contextmenu; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\*\shell\{#ProductKey}FastIde\command"; \
   ValueType: string; ValueName: ""; \
   ValueData: """{app}\{#ProductExe}"" --baocode-cli ""%1"" -n ""%1"""; \
-  Tasks: contextmenu
+  Tasks: contextmenu; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\shell\{#ProductKey}FastIde"; \
   ValueType: string; ValueName: ""; ValueData: "{code:MenuLabel|Fast Ide}"; \
-  Tasks: contextmenu; Flags: uninsdeletekey
+  Tasks: contextmenu; Flags: uninsdeletekey; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\shell\{#ProductKey}FastIde"; \
   ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#ProductExe}"""; \
-  Tasks: contextmenu
+  Tasks: contextmenu; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\shell\{#ProductKey}FastIde\command"; \
   ValueType: string; ValueName: ""; \
   ValueData: """{app}\{#ProductExe}"" --baocode-cli ""%V"" -n ""%V"""; \
-  Tasks: contextmenu
+  Tasks: contextmenu; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\{#ProductKey}FastIde"; \
   ValueType: string; ValueName: ""; ValueData: "{code:MenuLabel|Fast Ide}"; \
-  Tasks: contextmenu; Flags: uninsdeletekey
+  Tasks: contextmenu; Flags: uninsdeletekey; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\{#ProductKey}FastIde"; \
   ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#ProductExe}"""; \
-  Tasks: contextmenu
+  Tasks: contextmenu; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\{#ProductKey}FastIde\command"; \
   ValueType: string; ValueName: ""; \
   ValueData: """{app}\{#ProductExe}"" --baocode-cli ""%V"" -n ""%V"""; \
-  Tasks: contextmenu
+  Tasks: contextmenu; Check: ClassesAllowed
 ; The URL scheme, always: a site's one-click import of an upstream
 ; (baocode.dev/import opens baocode://provider/import?…; see
 ; docs/upstream-import.md), and the channel build's setup (baocode.dev/activate
@@ -230,14 +230,14 @@ Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\{#ProductKey}Fas
 ; Each product has one of its own (ProductScheme), so that one does not take
 ; the other's scheme away.
 Root: HKA; Subkey: "Software\Classes\{#ProductScheme}"; ValueType: string; \
-  ValueName: ""; ValueData: "URL:{#ProductName}"; Flags: uninsdeletekey
+  ValueName: ""; ValueData: "URL:{#ProductName}"; Flags: uninsdeletekey; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\{#ProductScheme}"; ValueType: string; \
-  ValueName: "URL Protocol"; ValueData: ""
+  ValueName: "URL Protocol"; ValueData: ""; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\{#ProductScheme}\DefaultIcon"; ValueType: string; \
-  ValueName: ""; ValueData: """{app}\{#ProductExe}"",0"
+  ValueName: ""; ValueData: """{app}\{#ProductExe}"",0"; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\{#ProductScheme}\shell\open\command"; \
   ValueType: string; ValueName: ""; \
-  ValueData: """{app}\{#ProductExe}"" --baocode-link ""%1"""
+  ValueData: """{app}\{#ProductExe}"" --baocode-link ""%1"""; Check: ClassesAllowed
 ; The browsers' native messaging host for the extension, always
 ; (windows/BrowserBridge): a browser finds the manifest, beside the
 ; executable, by its key, and the manifest names the host beside it.
@@ -271,17 +271,17 @@ Root: HKA; Subkey: "Software\Chromium\NativeMessagingHosts\{#ProductBrowserHost}
   ValueData: "{app}\{#ProductBrowserManifest}"; Flags: uninsdeletekey
 ; Unticked: what an earlier install added goes.
 Root: HKA; Subkey: "Software\Classes\*\shell\{#ProductKey}"; ValueType: none; \
-  Tasks: not contextmenu; Flags: deletekey
+  Tasks: not contextmenu; Flags: deletekey; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\shell\{#ProductKey}"; ValueType: none; \
-  Tasks: not contextmenu; Flags: deletekey
+  Tasks: not contextmenu; Flags: deletekey; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\{#ProductKey}"; \
-  ValueType: none; Tasks: not contextmenu; Flags: deletekey
+  ValueType: none; Tasks: not contextmenu; Flags: deletekey; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\*\shell\{#ProductKey}FastIde"; ValueType: none; \
-  Tasks: not contextmenu; Flags: deletekey
+  Tasks: not contextmenu; Flags: deletekey; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\shell\{#ProductKey}FastIde"; \
-  ValueType: none; Tasks: not contextmenu; Flags: deletekey
+  ValueType: none; Tasks: not contextmenu; Flags: deletekey; Check: ClassesAllowed
 Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\{#ProductKey}FastIde"; \
-  ValueType: none; Tasks: not contextmenu; Flags: deletekey
+  ValueType: none; Tasks: not contextmenu; Flags: deletekey; Check: ClassesAllowed
 
 [Run]
 Filename: "{app}\{#ProductExe}"; Description: "{cm:LaunchProgram,{#ProductName}}"; \
@@ -305,6 +305,56 @@ function WaitForSingleObject(hHandle: THandle; dwMilliseconds: DWORD): DWORD;
 function CloseHandle(hObject: THandle): BOOL;
   external 'CloseHandle@kernel32.dll stdcall';
 
+// Whether the places outside {app} may be written: the Start Menu folder
+// (its shortcuts) and Software\Classes (the context menu, the URL scheme).
+//
+// A profile that refuses them — a locked-down one, or Setup run without the
+// user's own token — loses those and keeps the program, rather than the
+// installation rolling back on the first one it cannot write and leaving
+// nothing installed at all, which is what it did before this was asked.
+var
+  MenuWritable: Boolean;
+  ClassesWritable: Boolean;
+
+/// Whether [Dir] can be made: made here, as Setup would make it.
+function ProbeDir(const Dir: String): Boolean;
+begin
+  Result := ForceDirectories(Dir);
+end;
+
+/// Whether [Subkey] of [Root] can be written: a value put in, then removed.
+function ProbeKey(Root: Integer; const Subkey: String): Boolean;
+var
+  Probe: String;
+begin
+  Probe := Subkey + '\__baocode_probe';
+  Result := RegWriteStringValue(Root, Probe, '', '1');
+  if Result then
+    RegDeleteKeyIncludingSubkeys(Root, Probe);
+end;
+
+/// Whether the context menu and the URL scheme can be registered, in the
+/// hive the install mode writes.
+function ProbeClasses: Boolean;
+begin
+  if IsAdminInstallMode then
+    Result := ProbeKey(HKEY_LOCAL_MACHINE, 'Software\Classes\*\shell')
+  else
+    Result := ProbeKey(HKEY_CURRENT_USER, 'Software\Classes\*\shell');
+end;
+
+/// The Start Menu's, as [Check] wants it: a function, not a value.
+function MenuAllowed: Boolean;
+begin
+  Result := MenuWritable;
+end;
+
+/// Software\Classes', as [Check] wants it.
+function ClassesAllowed: Boolean;
+begin
+  Result := ClassesWritable;
+end;
+
 // An update the app runs (lib/update/installer_io.dart) starts Setup as the
 // app quits, with /WAITPID=<the app's process>, so the elevation it asks
 // for comes up in front of the app: it waits here (two minutes at most) for
@@ -316,6 +366,15 @@ var
   App: THandle;
 begin
   Result := True;
+  // Asked before anything is written: what cannot be written is skipped
+  // rather than aborted on, so that the program itself still goes in.
+  MenuWritable := ProbeDir(ExpandConstant('{group}'));
+  ClassesWritable := ProbeClasses;
+  if not MenuWritable then
+    Log('The Start Menu folder cannot be written: its shortcuts are skipped');
+  if not ClassesWritable then
+    Log('Software\Classes cannot be written: the context menu and the ' +
+        'URL scheme are skipped');
   Pid := StrToIntDef(ExpandConstant('{param:WAITPID|0}'), 0);
   if Pid <= 0 then
     Exit;
@@ -387,3 +446,4 @@ begin
   end;
   Result := Pos(';' + Uppercase(Param) + ';', ';' + Uppercase(Path) + ';') = 0;
 end;
+
