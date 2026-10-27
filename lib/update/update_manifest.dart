@@ -7,20 +7,20 @@ import 'version.dart';
 /// Where the app looks for its next version: the release manifest
 /// published with this fork's GitHub releases (docs/auto-update.md has
 /// its format).
-const defaultManifestUrl =
-    'https://github.com/poying2018/baocode-codex/releases/latest/download/latest.json';
-
-/// Where the app of [product] looks for its next version: the manifest
-/// of that product.
 ///
-/// The two products are separate programs, and a release of one is not an
-/// update of the other: each has its own manifest, in the same release.
-String manifestUrlFor(String product) => switch (product) {
-  'baocode-codex' =>
+/// This repository publishes one manifest, the codex product's; the
+/// fallback is that same one, since a build named otherwise still lives
+/// or dies by the channel this repository actually keeps.
+const defaultManifestUrl =
     'https://github.com/poying2018/baocode-codex/releases/latest/download/'
-        'latest-codex.json',
-  _ => defaultManifestUrl,
-};
+    'latest-codex.json';
+
+/// Where the app of [product] looks for its next version.
+///
+/// This repository publishes the codex product alone, and one manifest:
+/// every build it holds — however it is named — updates from that channel,
+/// which is the only one here.
+String manifestUrlFor(String product) => defaultManifestUrl;
 
 /// The environment variable that points the app at another manifest, to
 /// try a release before it is published (a local server's, say).

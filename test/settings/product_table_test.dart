@@ -72,13 +72,18 @@ void main() {
   });
 
   group('the update channel', () {
-    test('is each product\'s own manifest', () {
-      expect(manifestUrlFor('baocode'), defaultManifestUrl);
+    test('is this repository\'s one manifest, whatever the build\'s name',
+        () {
+      // This repository ships the codex product alone, and publishes only
+      // its channel: every build it holds updates from it. (The Claude
+      // product's channel lives in the other repository.)
       expect(manifestUrlFor('baocode-codex'), contains('latest-codex.json'));
+      expect(manifestUrlFor('baocode'), defaultManifestUrl);
       expect(
-        manifestUrlFor('baocode-codex'),
-        isNot(defaultManifestUrl),
-        reason: 'a release of one product is not an update of the other',
+        manifestUrlFor('baocode'),
+        isNot(contains('download/latest.json')),
+        reason: 'no latest.json is published here; a fallback that asked '
+            'for it found nothing but a 404',
       );
     });
   });
