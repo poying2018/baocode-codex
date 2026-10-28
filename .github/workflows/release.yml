@@ -163,6 +163,26 @@ jobs:
           # the backstop.
           dart tool/bump_codex_version.dart
 
+  # The compiler's own reading of the code, before anything is built: a tag
+  # that does not analyze is not one to build. Errors and warnings fail it;
+  # the infos it reports are left to the reader (2026-10-28: none of them
+  # outside the packages' own tests).
+  analyze:
+    name: Analyze the code
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Get the packages, then analyze
+        run: |
+          flutter pub get
+          dart analyze
+
   # The codex product's server: it carries its servers-codex.json, and the
   # app downloads the build a host needs (docs/ssh-remote.md, 9.3). Its
   # artifacts: remote (VERSION, servers-codex.json, the .gz), remote-linux.
@@ -181,7 +201,7 @@ jobs:
   # files and artifacts end in -channel.
   windows:
     name: Build for Windows (${{ matrix.edition }})
-    needs: [check, remote]
+    needs: [check, remote, analyze]
     runs-on: windows-latest
     strategy:
       # One edition failing leaves the other building, to be re-run alone.
