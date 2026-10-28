@@ -168,8 +168,14 @@ git merge upstream/main --no-edit
   想用真的：装 `npm install -g @openai/codex`，或用
   `$env:BAOCODE_CODEX_COMMAND = 'dart F:\Projects\baocode-codex\tool\codex_stub.dart'`
   先跑假的那份。
-- **Inno Setup 装不上**（离线安装包在本机起不来）：安装包只能在 CI 上出
-  （`release.yml` 里 `choco install innosetup`）。
+- **Inno Setup**：本机有（`%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe`）。别被重定向
+  `LOCALAPPDATA` 的构建脚本骗了 —— 那样 ISCC 会「找不到」；把 `Inno Setup 6` 整个目录
+  复制到 `F:\Projects\tmp\localappdata\Programs\` 即可。已有 `build\windows\…\Release`
+  时 `dart run tool/build_windows.dart --skip-build` 能在本机出整包（2026-10-28 实测，
+  134 MB，退出码 0）。**发版仍然在 CI**（`release.yml` 里 `choco install innosetup`）。
+- **`flutter analyze` 会卡住**（同日实测）：`flutter` 工具启动时去 GitHub 查更新，
+  本机直连超时、又不走代理，进程停在 0% CPU。用 `dart analyze`（同一套规则，
+  实测 0 error / 0 warning）。
 - **远端服务器的 Linux 版编不了**：`dart compile exe --target-os linux` 要联网下载
   AOT 运行时。CI 上有。
 - **沙箱**：从 DSH 里起的应用写不了工作区以外的地方（`%APPDATA%`、`~\.codex` 会 errno 5），
