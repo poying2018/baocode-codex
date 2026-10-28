@@ -42,7 +42,6 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 100));
 
     final ids = kernel.model.options.map((option) => option.id).toList();
-    print('offered: $ids');
     expect(ids, contains('@deepseek/deepseek-chat'));
     expect(ids, contains('@deepseek/deepseek-reasoner'));
     expect(ids, contains('@kimi/kimi-k2'));

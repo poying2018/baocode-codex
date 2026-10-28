@@ -20,8 +20,6 @@ void main() {
       token: 'proxy-token',
     );
     final launch = launchOn(const CodexLaunch(cwd: r'F:\Projects'), upstream);
-    print('arguments: ${launch.arguments}');
-    print('environment: ${launch.environment}');
 
     expect(launch.model, 'deepseek-chat');
     expect(launch.arguments, contains('--model'));
@@ -32,7 +30,6 @@ void main() {
     for (var i = 0; i < launch.arguments.length; i++) {
       if (launch.arguments[i] == '--config') configs.add(launch.arguments[i + 1]);
     }
-    print('configs: $configs');
     expect(
       configs,
       contains('model_providers.deepseek.base_url="http://127.0.0.1:1234/p/deepseek"'),
