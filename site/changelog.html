@@ -30,6 +30,28 @@
   <h1>Changelog</h1>
   <p class="subtitle">What changed in each version of BaoCode.</p>
 
+  <section class="release" id="v1.7.1">
+    <h2 class="plain"><a href="#v1.7.1">1.7.1</a></h2>
+    <p>BaoCode Codex 1.7.1: installed, even where the profile says no</p>
+    <p>A machine whose profile does not allow the Start Menu folder to be
+    written, or HKCU\Software\Classes, used to end a setup with nothing
+    installed at all: the first entry Setup failed to write rolled the whole
+    installation back. The program goes in now, and the entries that cannot
+    be written — the shortcuts, the context menu, the baocode link — are left
+    out, with the reason in the log.</p>
+    <p>Fixed</p>
+    <ul>
+    <li>Setup no longer rolls back when the Start Menu folder or the context
+    menu and URL scheme cannot be written: the program is installed and
+    those are skipped.</li>
+    <li>Uninstalling asks what the install asked, so the shortcuts and keys
+    that were written are taken away, and the ones that were skipped are
+    not looked for.</li>
+    <li>The Codex CLI the bundle carries is 0.165.0.</li>
+    <li>The changelog on the site carries 1.7.0, which it had been missing.</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.0">
     <h2 class="plain"><a href="#v1.7.0">1.7.0</a></h2>
     <p>BaoCode Codex 1.7.0: the models are yours to choose</p>

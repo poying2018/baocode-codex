@@ -30,6 +30,24 @@
   <h1>更新日志</h1>
   <p class="subtitle">BaoCode 每个版本的变化。</p>
 
+  <section class="release" id="v1.7.1">
+    <h2 class="plain"><a href="#v1.7.1">1.7.1</a></h2>
+    <p>BaoCode Codex 1.7.1：写不进去的地方，也不再装不上</p>
+    <p>如果用户的配置不允许写「开始菜单」文件夹，或不允许写
+    <code>HKCU\Software\Classes</code>，以前装到最后会<strong>整体回滚，什么都没装上</strong>——Setup
+    写不进第一条就放弃。现在程序照常装好，写不进去的那几项（快捷方式、右键菜单、
+    baocode 链接）跳过，原因写进日志。</p>
+    <p>修复</p>
+    <ul>
+    <li>开始菜单文件夹、或右键菜单与 URL 协议写不进去时，安装不再回滚：程序装好，
+    那几项跳过。</li>
+    <li>卸载时用和安装时相同的判断：装上了的快捷方式和注册表项会被清掉，当初跳过的
+    不会去误找。</li>
+    <li>内置的 Codex CLI 升到 0.165.0。</li>
+    <li>站点 changelog 补上了缺失的 1.7.0。</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.0">
     <h2 class="plain"><a href="#v1.7.0">1.7.0</a></h2>
     <p>BaoCode Codex 1.7.0：模型由你自己定</p>
