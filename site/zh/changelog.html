@@ -30,6 +30,61 @@
   <h1>更新日志</h1>
   <p class="subtitle">BaoCode 每个版本的变化。</p>
 
+  <section class="release" id="v1.7.0">
+    <h2 class="plain"><a href="#v1.7.0">1.7.0</a></h2>
+    <p>BaoCode Codex 1.7.0：模型由你自己定</p>
+    <p>这一版把「模型」这件事整对了。之前选择器里的模型是<strong>编出来的</strong>——<code>gpt-5.5-codex</code>、
+    <code>gpt-5.5-mini</code> 这些服务器根本不认，选中之后发出去的请求会被拒，看起来像模型坏了。
+    现在它显示的是<strong>服务器真正提供的</strong>模型，而且<strong>你在「模型配置」里加的上游也会出现</strong>，
+    可以直接选来用。</p>
+    <p>新功能</p>
+    <ul>
+    <li><strong>自定义上游的模型会出现在模型选择器里</strong>，按上游分组，形如 <code>@deepseek/deepseek-chat</code>。
+    选中之后这一轮对话就真的跑在那个上游上：端点、密钥、协议都由应用交给 Codex，
+    密钥只走环境变量，不落在命令行上。</li>
+    <li>任意协议的上游都能用：Codex 只说 OpenAI 的 Responses 一种协议，应用自己的本地代理
+    负责把请求翻译到你的上游（Chat Completions 也好，别的也好）。</li>
+    <li>模型选择器里还多了上游的报错提示：某个上游连不上，它那一组会标出来。</li>
+    </ul>
+    <p>修复</p>
+    <ul>
+    <li><strong>选择器不再显示服务器没有的模型</strong>。之前那份兜底清单是编的，选中会失败。</li>
+    <li><strong>模型清单在会话一开始就向服务器要</strong>，不再等第一条消息发出后才拉——所以第一次
+    打开对话时选择器就是对的。</li>
+    <li><strong>清单会记住</strong>：这次问到的模型存下来，下次启动先显示它，不必等服务器。</li>
+    <li><strong>软件传下来的模型是生效值</strong>：设置里定的模型、以及你上次选的，都不会被服务器清单
+    悄悄覆盖；服务器没列出的选择也仍然保留并显示，而不是静默换成别的。</li>
+    </ul>
+  </section>
+
+  <section class="release" id="v1.6.0">
+    <h2 class="plain"><a href="#v1.6.0">1.6.0</a></h2>
+    <p>BaoCode Codex：codex 那个产品，独立的一版</p>
+    <p>这是另一个程序：和 BaoCode Claude 同一份源码，但它是<strong>自己的一个产品</strong>。自己的安装包、
+    自己的文件夹、自己的更新通道、自己的链接——装它不会动 Claude Code 那个，两个可以并排跑，
+    互相看不到对方的数据。</p>
+    <p><strong>它自带 Codex CLI</strong>。OpenAI 的 CLI 就在安装包里（钉了版本，并按 registry 的校验值核对），
+    所以机器上没有 Codex 也不用装、不用下：应用直接跑包里那份。你自己有——在 PATH 上、
+    npm 装的、或者 Codex 桌面版带的——就用你的，带你的登录和设置。</p>
+    <p>新功能</p>
+    <ul>
+    <li>应用自带 Codex CLI（0.164.0）：第一次对话之前不用装、不用等下载。</li>
+    <li>各方面都是自己的产品：自己的安装包与卸载项、自己的数据目录
+    （<code>%APPDATA%\baocode-codex</code>）、自己的窗口与注册信息、自己的链接
+    （<code>baocode-codex://</code>）、自己的 Stash 目录、自己的钥匙串条目，以及自己的远端服务器构建。</li>
+    <li>计划模式：agent 只读地做计划，点「开始构建」才照着做。</li>
+    </ul>
+    <p>修好了</p>
+    <ul>
+    <li>适配层现在按 app-server 的真实协议说话。有三个缺陷会让机器<strong>根本起不来</strong>：
+    发了服务器没有的参数（可能整个请求被拒）、发了一个并不存在的协作模式、
+    以及请求 id 会和服务器的数字撞上——撞上时那一轮就永远等不到回音。</li>
+    <li>服务器报的东西都用上了：思考的正文、MCP 服务器状态、配额推送；
+    用户拒绝的命令不再一直显示成「在运行」。</li>
+    <li>Stash 技能写进这个产品<strong>自己的</strong> agent 目录，不再写进 Claude Code 的。</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.5.3">
     <h2 class="plain"><a href="#v1.5.3">1.5.3</a></h2>
     <p>地址都指向本仓库，Windows 上打字回来了</p>

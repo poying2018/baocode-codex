@@ -30,6 +30,78 @@
   <h1>Changelog</h1>
   <p class="subtitle">What changed in each version of BaoCode.</p>
 
+  <section class="release" id="v1.7.0">
+    <h2 class="plain"><a href="#v1.7.0">1.7.0</a></h2>
+    <p>BaoCode Codex 1.7.0: the models are yours to choose</p>
+    <p>This version puts the models right. The picker used to offer models that
+    were made up — <code>gpt-5.5-codex</code>, <code>gpt-5.5-mini</code>, which the server does not
+    have: a turn asked for one and was refused, which read as the model being
+    broken. It offers the models the server actually has now — and the upstreams
+    you configured in Settings → Models appear there too, ready to pick.</p>
+    <p>New</p>
+    <ul>
+    <li>The models of your own upstreams appear in the picker, grouped under
+    their upstream, as <code>@deepseek/deepseek-chat</code> and the like. Picking one
+    runs the conversation on it: the endpoint, the key and the protocol are
+    given to Codex by the app, and the key travels in the environment rather
+    than on a command line.</li>
+    <li>Any upstream's protocol works: Codex speaks one protocol (OpenAI's
+    Responses), and the app's own local proxy translates for the upstream,
+    whatever it speaks.</li>
+    <li>A group whose upstream cannot be reached says so, in the picker.</li>
+    </ul>
+    <p>Fixed</p>
+    <ul>
+    <li>The picker no longer offers models the server does not have.</li>
+    <li>The list is asked for as the conversation opens, not only when the first
+    message starts the server, so the picker is right the first time.</li>
+    <li>The list is kept: what the server listed is shown again at the next start,
+    before the server has said anything.</li>
+    <li>The model the software passes down is what is in effect — the one in your
+    settings, and the one you picked last — instead of being quietly replaced
+    by whatever the server's list names first. A pick the server does not list
+    is kept and shown rather than silently becoming another model.</li>
+    </ul>
+  </section>
+
+  <section class="release" id="v1.6.0">
+    <h2 class="plain"><a href="#v1.6.0">1.6.0</a></h2>
+    <p>BaoCode Codex: the codex product, on its own</p>
+    <p>This is the other program: the same source as BaoCode Claude, but a product of
+    its own. Its own installer, its own folder, its own update channel and its own
+    links — installing it does not touch the Claude Code one, and the two run side
+    by side without seeing each other's data.</p>
+    <p>It brings the Codex CLI with it. OpenAI's CLI travels in the installer (pinned
+    by version, and checked against the registry's own checksum), so a machine with
+    no Codex of its own needs neither an install nor a download: the app runs the
+    one it carries. If you have one of your own — in your PATH, from the npm
+    package, or the Codex desktop app's — yours is used instead, with your sign-in
+    and your settings.</p>
+    <p>New</p>
+    <ul>
+    <li>The app carries the Codex CLI (0.164.0): nothing to install and nothing to
+    download before the first conversation.</li>
+    <li>A product of its own in every way: its own installer and uninstall entry,
+    its own data folder (%APPDATA%\baocode-codex), its own windows and
+    registration, its own links (baocode-codex://), its own Stash folder, its
+    own keychain entry, and its own remote-server builds.</li>
+    <li>Plan mode: the agent plans with no write access, and Start building carries
+    the plan out.</li>
+    </ul>
+    <p>Fixed</p>
+    <ul>
+    <li>The adapter now speaks the app-server's protocol as it is. Three defects
+    could stop a machine from starting at all: a parameter the server does not
+    have (which can make it refuse the request outright), a collaboration mode
+    that does not exist, and request ids that the server's own numbers could
+    collide with — a collision that left a turn waiting for ever.</li>
+    <li>What the server reports is used: the reasoning text, MCP server state and
+    quota pushes; a command the user declined no longer sits there as running.</li>
+    <li>The Stash skill goes into this product's own agent folder, not into Claude
+    Code's.</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.5.3">
     <h2 class="plain"><a href="#v1.5.3">1.5.3</a></h2>
     <p>Every address is this build's own, and typing works on Windows again</p>
