@@ -2,3 +2,9 @@
 # leaves a \r at the end of every line, and the frontmatter is not
 # recognised. Keep them as they are written.
 .minimax/** text eol=lf
+
+# Flutter writes these itself on every build, always with \n. Left to
+# core.autocrlf they are checked out as CRLF and then rewritten, so `git
+# status` shows them changed with nothing changed in them.
+*/flutter/generated_plugin* text eol=lf
+*/Flutter/GeneratedPluginRegistrant.swift text eol=lf
