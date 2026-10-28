@@ -117,7 +117,7 @@ const _claudeUrl =
 const _codexVersion = '0.165.0';
 const _codexPlatform = 'win32-x64';
 const _codexIntegrity =
-      'sha512-f5LMyugPSnAovnTnR1N+SNHSTfWZ+ym5A4H3zZHz/zhuMGMGZD8IxUdlSUlEbiENYyPXrJ8G3Jh+CLyzTfQB6Q==';
+    'sha512-f5LMyugPSnAovnTnR1N+SNHSTfWZ+ym5A4H3zZHz/zhuMGMGZD8IxUdlSUlEbiENYyPXrJ8G3Jh+CLyzTfQB6Q==';
 
 /// Where that package is: the npm registry's own file for the platform.
 const _codexUrl =

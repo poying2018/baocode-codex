@@ -119,7 +119,7 @@ String writtenWithPin(String text, String version, String checksum) => text
     )
     .replaceAll(
       RegExp("const $_integrityConstant =\\s*'[^']*';"),
-      "const $_integrityConstant =\n      '$checksum';",
+      "const $_integrityConstant =\n    '$checksum';",
     );
 
 /// The version the registry is at; null when it could not be read.

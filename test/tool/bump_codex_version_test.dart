@@ -68,6 +68,16 @@ const _codexUrl =
       expect(twice, once);
     });
 
+    test('the checksum sits where the formatter puts it', () {
+      final written = writtenWithPin(pin(), '0.165.0', 'sha512-${'a' * 86}==');
+      expect(
+        written,
+        contains("const _codexIntegrity =\n    'sha512-"),
+        reason: 'a continuation line takes four spaces: the bot\'s commit of '
+            '0.165.0 was indented six, which dart format would have undone',
+      );
+    });
+
     test('the rest of the file is left alone', () {
       final written = writtenWithPin(pin(), '0.165.0', 'sha512-${'a' * 86}==');
       expect(written, contains('registry.npmjs.org'));
