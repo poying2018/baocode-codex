@@ -180,15 +180,18 @@ git merge upstream/main --no-edit
   AOT 运行时。CI 上有。
 - **沙箱**：从 DSH 里起的应用写不了工作区以外的地方（`%APPDATA%`、`~\.codex` 会 errno 5），
   所以开发跑应用时把 `BAOCODE_DATA_DIR` 指到工作区里。
-- **Dart VM 起的 Git bash 必死**（2026-10-28/29 实测）：`Process.start('C:\Program Files\Git\bin\bash.exe', …)`
-  —— 不管带不带环境、`--norc`、`bin` 还是 `usr\bin` —— 一律 `exit=-1073741502`（0xC0000022），
-  stderr 是 `fatal error - NtCreateDirectoryObject(\BaseNamedObjects\msys-…): 0xC0000022`（拒绝访问）。
-  同一个 `bash.exe` 从终端里起是正常的，Dart VM 起 `cmd.exe` 也正常 —— 本机的安全策略按**父进程**
-  拦 `msys-2.0.dll` 的 `\BaseNamedObjects` 对象创建。
+- **Dart VM 起的 Git bash 必死（低完整性令牌）**（2026-10-29 定位）：Dart 起的子进程跑在
+  `Low Mandatory Level`（`S-1-16-4096`），终端里起的 bash 是 `Medium`（`S-1-16-8192`）——
+  `whoami /groups` 对照实测。低完整性建不了 `\BaseNamedObjects` 里的 `msys-2.0…` 对象，于是
+  bash 秒退 `exit=-1073741502`（0xC0000022），stderr 是
+  `fatal error - NtCreateDirectoryObject(\BaseNamedObjects\msys-…): 0xC0000022`。
+  两个"包一层"的绕法实测**都不行**：`cmd.exe /d /s /c "bash -c …"` 里 bash 照样死（cmd 把同一个
+  低完整性令牌传下去），`powershell -Command` 同理。同一 VM 起 `cmd.exe` 正常 —— 它不需要那个命名对象。
+  所以这不是能改的代码，也修不了，只能绕过。
 - **受害面与判定**：凡测试里要真跑 shell 命令的断言，本机都过不去 —— `packages/bao_agent` 的
   engine 测试、app 层 `test/kernel/dart_core_e2e_test.dart` 里「a command sent to the background…」
-  （后台任务注册不上）。`-j 1` 串行**不能**缓解：父进程是 Dart VM 就够了，与并发无关（2026-10-29
-  实测单文件串行同样失败）。判定办法：失败输出里有 `NtCreateDirectoryObject` 就是它，不是代码回归。
+  （后台任务注册不上）。`-j 1` 串行**不能**缓解：低完整性令牌与并发无关（2026-10-29 实测单文件
+  串行同样失败）。判定办法：失败输出里有 `NtCreateDirectoryObject` 就是它，不是代码回归。
   那条 e2e 现在自己探测 shell，起不来就 `markTestSkipped` 并写明原因，不再等满 30 秒超时；
   `packages/bao_agent` 的 engine 测试走同一招（`test/support/shell.dart` 的 `skipWithoutShell()`，
   覆盖 13 条要真命令的用例：hooks、权限判定、shell 前后台、interrupt）。本机因此是
