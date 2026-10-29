@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 
 import '../support/harness.dart';
+import '../support/shell.dart';
 
 void main() {
   late Harness h;
@@ -51,6 +52,7 @@ void main() {
     );
 
     test('a file changed since it was read must be read again', () async {
+      if (await skipWithoutShell()) return;
       h = await Harness.start(files: {'a.txt': 'one\n'});
       final path = p.join(h.cwd, 'a.txt');
       h.model.script.addAll([
@@ -409,6 +411,7 @@ void main() {
 
   group('shell', () {
     test('output, exit codes, and the shell staying where it went', () async {
+      if (await skipWithoutShell()) return;
       h = await Harness.start(files: {'sub/f.txt': ''});
       h.model.script.addAll([
         Reply.tool('Bash', {
@@ -443,6 +446,7 @@ void main() {
     test(
       'in the background: started, told when done, a turn of its own',
       () async {
+        if (await skipWithoutShell()) return;
         h = await Harness.start();
         String? told;
         h.model.script.addAll([
@@ -483,6 +487,7 @@ void main() {
     test(
       'a running command sent to the background (background_tasks)',
       () async {
+        if (await skipWithoutShell()) return;
         h = await Harness.start();
         h.model.script.addAll([
           Reply.tool('Bash', {
@@ -544,6 +549,7 @@ void main() {
     });
 
     test('TaskOutput waits for it, TaskStop stops another', () async {
+      if (await skipWithoutShell()) return;
       h = await Harness.start();
       h.model.script.addAll([
         Reply.tool('Bash', {

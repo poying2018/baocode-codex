@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 
 import '../support/harness.dart';
+import '../support/shell.dart';
 
 /// The hook at [path] as a command the shell runs: on Windows a script is
 /// not run of itself, so the shell is told to run it.
@@ -188,6 +189,7 @@ void main() {
     });
 
     test('its API fails: the call says so; its hooks run', () async {
+      if (await skipWithoutShell()) return;
       final bin = Directory.systemTemp
           .createTempSync('hooks_')
           .resolveSymbolicLinksSync();
@@ -267,6 +269,7 @@ void main() {
 
   group('compaction', () {
     test('a PreCompact hook adds to the instructions; todos and the plan carried over', () async {
+      if (await skipWithoutShell()) return;
       final bin = Directory.systemTemp
           .createTempSync('hooks_')
           .resolveSymbolicLinksSync();
@@ -574,6 +577,7 @@ void main() {
   });
 
   test('Bash: long output cut in the middle; TaskOutput filtered; TaskStop of what is not running', () async {
+    if (await skipWithoutShell()) return;
     h = await Harness.start(environment: {'BASH_MAX_OUTPUT_LENGTH': '200'});
     h.model.script.addAll([
       Reply.tool('Bash', {'command': 'seq 1 500', 'description': 'Count'}),

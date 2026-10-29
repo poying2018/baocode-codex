@@ -190,7 +190,9 @@ git merge upstream/main --no-edit
   （后台任务注册不上）。`-j 1` 串行**不能**缓解：父进程是 Dart VM 就够了，与并发无关（2026-10-29
   实测单文件串行同样失败）。判定办法：失败输出里有 `NtCreateDirectoryObject` 就是它，不是代码回归。
   那条 e2e 现在自己探测 shell，起不来就 `markTestSkipped` 并写明原因，不再等满 30 秒超时；
-  引擎的 shell 相关结论只能靠 CI（Linux）。
+  `packages/bao_agent` 的 engine 测试走同一招（`test/support/shell.dart` 的 `skipWithoutShell()`，
+  覆盖 13 条要真命令的用例：hooks、权限判定、shell 前后台、interrupt）。本机因此是
+  `150 通过 / 29 跳过 / 0 失败`；引擎的 shell 相关结论只能靠 CI（Linux）。
 
 ## 文档
 

@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 
 import '../support/harness.dart';
+import '../support/shell.dart';
 
 void main() {
   late Harness h;
@@ -48,6 +49,7 @@ void main() {
     test(
       'allowed from now on: the rule is saved and not asked again',
       () async {
+        if (await skipWithoutShell()) return;
         h = await Harness.start();
         h.model.script.addAll([
           Reply.tool('Bash', {
@@ -74,6 +76,7 @@ void main() {
     );
 
     test('read-only commands and reads in the project are not asked', () async {
+      if (await skipWithoutShell()) return;
       h = await Harness.start(files: {'a.txt': 'hello\n'});
       h.model.script.addAll([
         Reply.tools([
@@ -135,6 +138,7 @@ void main() {
     test(
       'acceptEdits: edits and file commands in the project, not others',
       () async {
+        if (await skipWithoutShell()) return;
         h = await Harness.start(permissionMode: 'acceptEdits');
         h.model.script.addAll([
           Reply.tool('Write', {
@@ -288,6 +292,7 @@ void main() {
     });
 
     test('auto: the classifier allows or blocks', () async {
+      if (await skipWithoutShell()) return;
       h = await Harness.start(
         permissionMode: 'auto',
         errands: (request) {

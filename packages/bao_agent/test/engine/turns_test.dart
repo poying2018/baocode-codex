@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 
 import '../support/harness.dart';
+import '../support/shell.dart';
 
 List<Map<String, Object?>> lines(String file) => [
   for (final line in File(file).readAsLinesSync())
@@ -284,6 +285,7 @@ void main() {
   });
 
   test('an interrupt stops the turn and says so', () async {
+    if (await skipWithoutShell()) return;
     h = await Harness.start(
       script: [
         Reply.tool('Bash', {'command': 'sleep 30', 'description': 'Long'}),
