@@ -183,6 +183,33 @@ jobs:
           flutter pub get
           dart analyze
 
+  # What the code does, before anything is built: one that passes the
+  # compiler and fails its own tests is not one to ship either. The suites
+  # run are the medium regression of docs/codex-project.md — the whole of
+  # test/ takes longer than a build and reaches for tools a runner has not
+  # got. The engine's own tests are the other half: they are where a shell
+  # is real, which on a developer's Windows machine it is not (the note on
+  # low integrity tokens there).
+  test:
+    name: Test
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Get the packages
+        run: flutter pub get
+      - name: The kernel, its updates and its settings
+        run: flutter test test/update test/settings test/kernel
+      - name: The agent itself
+        working-directory: packages/bao_agent
+        run: flutter test
+
   # The codex product's server: it carries its servers-codex.json, and the
   # app downloads the build a host needs (docs/ssh-remote.md, 9.3). Its
   # artifacts: remote (VERSION, servers-codex.json, the .gz), remote-linux.
@@ -201,7 +228,7 @@ jobs:
   # files and artifacts end in -channel.
   windows:
     name: Build for Windows (${{ matrix.edition }})
-    needs: [check, remote, analyze]
+    needs: [check, remote, analyze, test]
     runs-on: windows-latest
     strategy:
       # One edition failing leaves the other building, to be re-run alone.

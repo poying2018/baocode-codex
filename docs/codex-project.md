@@ -111,6 +111,11 @@ cd F:\Projects\baocode-codex-dev
   flutter test test\stash
   ```
 
+  发版时 CI 会跑两批（`release.yml` 的 `test` job，在构建之前）：`test/update test/settings
+  test/kernel`，和 `packages/bao_agent` 的全套。本机因低完整性令牌跳过的那 13+1 条 shell 用例，
+  在那里是真跑——所以「本机跳过」不等于「没人验」。日常推 `main` 不跑测试，要看结果就手动
+  触发一次 Release 工作流。
+
 ## 更新链
 
 应用从本仓库的 release 取自己的下一版：
