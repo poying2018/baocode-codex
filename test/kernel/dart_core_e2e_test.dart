@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bao_agent/src/util/processes.dart' show Shell;
 import 'package:bao_agent/testing.dart';
 import 'package:baocode/kernel/agent_kernel.dart';
 import 'package:baocode/kernel/claude_code/claude_code_kernel.dart';
@@ -117,6 +118,28 @@ void main() {
     expect(api.model.requests.map((r) => r.body['model']).toSet(), {_model});
     expect(api.headers.map((h) => h['x-api-key']).toSet(), {'sk-e2e'});
   }
+
+  /// Whether a command can run here at all. A security policy that denies
+  /// the MSYS runtime its `\BaseNamedObjects` object makes every bash
+  /// started by a Dart VM exit at once (docs/codex-project.md, 本机限制),
+  /// and a test that needs one would wait out its timeout saying nothing
+  /// about why.
+  bool? shellStarts;
+  Future<bool> canRunCommands() async => shellStarts ??= await () async {
+    final shell = Shell.find({
+      'HOME': root,
+      'PATH': Platform.environment['PATH'] ?? '/usr/bin:/bin',
+    });
+    try {
+      final ran = await Process.run(
+        shell.executable,
+        shell.arguments('echo bao', p.join(root, 'shell-probe-cwd')),
+      );
+      return ran.exitCode == 0;
+    } on ProcessException {
+      return false;
+    }
+  }();
 
   /// A kernel on the core, its transcript, and answers to what it asks.
   ({ClaudeCodeKernel kernel, Transcript transcript, List<String> asked}) open(
@@ -287,6 +310,14 @@ void main() {
   test(
     'a command sent to the background, a goal, MCP servers, a suggestion',
     () async {
+      if (!await canRunCommands()) {
+        markTestSkipped(
+          'This machine cannot start the shell commands run in — bash exits '
+          'at once (0xC0000022). The background task has nothing to run in; '
+          'CI (Linux) is where this test speaks.',
+        );
+        return;
+      }
       api.model.script.addAll([
         Reply.tool('Bash', {
           'command': 'sleep 3; echo bg-done',

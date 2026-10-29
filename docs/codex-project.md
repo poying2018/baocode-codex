@@ -180,22 +180,17 @@ git merge upstream/main --no-edit
   AOT 运行时。CI 上有。
 - **沙箱**：从 DSH 里起的应用写不了工作区以外的地方（`%APPDATA%`、`~\.codex` 会 errno 5），
   所以开发跑应用时把 `BAOCODE_DATA_DIR` 指到工作区里。
-- **MSYS bash 在多进程并发时起不来**（2026-10-28 实测）：单个
-  `C:\Program Files\Git\bin\bash.exe -c …` 正常，但测试套件并发起多个 bash 时
-  报 `fatal error - NtCreateDirectoryObject(\BaseNamedObjects\msys-…): 0xC0000022`
-  （拒绝访问），进程秒退。受害面：所有要真起 shell 的测试 ——
-  `packages/bao_agent` 的 engine 测试、app 层的 `test/kernel/dart_core_e2e_test.dart`
-  （「a command sent to the background…」确定性失败，后台任务注册不上）。
-  判定办法：失败输出里有 `NtCreateDirectoryObject` 就是它，不是代码回归。
-  缓解：`flutter test … -j 1` 串行跑该文件；彻底解决要查安全软件对
-  BaseNamedObjects 的限制。CI（Linux）不受影响。
-- **Dart VM 直起 Git bash 必死**（同日实锤，上面那条的根因）：用
-  `Process.start('C:\Program Files\Git\bin\bash.exe', …)` —— 不管带不带环境、
-  `--norc`、`bin` 还是 `usr\bin` —— 一律 `exit=-1073741502`（0xC0000022）；
-  同样的 Dart VM 起 `cmd.exe` 正常，MSYS 自己链起的 bash 正常。即：
-  本机的安全策略按**父进程**拦 `msys-2.0.dll` 的 `\BaseNamedObjects` 对象创建。
-  含义：凡测试里真要跑 shell 命令的断言，在本机一律视为环境不可用，别当回归查；
-  引擎的 shell 相关测试只能靠 CI（Linux）给结论。
+- **Dart VM 起的 Git bash 必死**（2026-10-28/29 实测）：`Process.start('C:\Program Files\Git\bin\bash.exe', …)`
+  —— 不管带不带环境、`--norc`、`bin` 还是 `usr\bin` —— 一律 `exit=-1073741502`（0xC0000022），
+  stderr 是 `fatal error - NtCreateDirectoryObject(\BaseNamedObjects\msys-…): 0xC0000022`（拒绝访问）。
+  同一个 `bash.exe` 从终端里起是正常的，Dart VM 起 `cmd.exe` 也正常 —— 本机的安全策略按**父进程**
+  拦 `msys-2.0.dll` 的 `\BaseNamedObjects` 对象创建。
+- **受害面与判定**：凡测试里要真跑 shell 命令的断言，本机都过不去 —— `packages/bao_agent` 的
+  engine 测试、app 层 `test/kernel/dart_core_e2e_test.dart` 里「a command sent to the background…」
+  （后台任务注册不上）。`-j 1` 串行**不能**缓解：父进程是 Dart VM 就够了，与并发无关（2026-10-29
+  实测单文件串行同样失败）。判定办法：失败输出里有 `NtCreateDirectoryObject` 就是它，不是代码回归。
+  那条 e2e 现在自己探测 shell，起不来就 `markTestSkipped` 并写明原因，不再等满 30 秒超时；
+  引擎的 shell 相关结论只能靠 CI（Linux）。
 
 ## 文档
 
