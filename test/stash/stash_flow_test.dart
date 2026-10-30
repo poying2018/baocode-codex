@@ -61,7 +61,10 @@ void main() {
   const stashChannel = MethodChannel('test/stash');
   final hotkeys = <Object?>[];
 
-  Future<void> setUpFlow(WidgetTester tester) async {
+  Future<void> setUpFlow(
+    WidgetTester tester, {
+    DateTime Function()? clock,
+  }) async {
     hotkeys.clear();
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       stashChannel,
@@ -71,7 +74,7 @@ void main() {
       },
     );
     disk = MemoryStashDisk();
-    store = StashStore(disk);
+    store = StashStore(disk, clock: clock);
     workspace = Workspace.mock();
     host = _StashWindowHost(tester.view);
     windows = AppWindows(
@@ -137,7 +140,14 @@ void main() {
   testWidgets('a stash left blank stays, the draft gone on with', (
     tester,
   ) async {
-    await setUpFlow(tester);
+    // A clock that moves on with every reading: a draft is one that was
+    // never written in, and the real clock keeps the same millisecond for a
+    // write and the emptying that follows it.
+    var now = DateTime.utc(2026);
+    await setUpFlow(
+      tester,
+      clock: () => now = now.add(const Duration(seconds: 1)),
+    );
     await controller.present();
     final first = controller.editing!;
     await controller.hide();
