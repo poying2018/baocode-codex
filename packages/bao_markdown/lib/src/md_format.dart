@@ -214,7 +214,9 @@ extension MarkdownFormatting on MarkdownController {
   /// The `<span style>` the selection is all in: its colors.
   ({String? color, String? background}) colorsAt() {
     final selection = this.selection;
-    final segments = selection.isValid ? _segments(selection) : const [];
+    final segments = selection.isValid
+        ? _segments(selection)
+        : const <(int, int, int)>[];
     if (segments.isEmpty) return (color: null, background: null);
     final (line, from, to) = segments.first;
     final span = _runsAround(

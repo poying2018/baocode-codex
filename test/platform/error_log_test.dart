@@ -14,7 +14,7 @@ class _Throws extends StatelessWidget {
   const _Throws();
 
   @override
-  Widget build(BuildContext context) => Text(jsonDecode(r'"C:\Users"'));
+  Widget build(BuildContext context) => Text(jsonDecode(r'"C:\Users"') as String);
 }
 
 void main() {

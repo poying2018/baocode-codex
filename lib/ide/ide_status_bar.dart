@@ -314,6 +314,11 @@ class IdeLanguageNames {
   static List<TextMateLanguageRegistration> _textMateLanguages = const [];
   static Future<void>? _loading;
 
+  /// What was loaded, or nothing yet — typed, so that a `const []` in its
+  /// place does not make every use of it `dynamic`.
+  static List<MonacoLanguageRegistration> get _loadedRegistrations =>
+      _registrations ?? const <MonacoLanguageRegistration>[];
+
   /// Loads the registrations once; [onLoaded] runs when they first arrive.
   static void ensureLoaded(VoidCallback onLoaded) {
     if (_registrations != null) return;
@@ -355,7 +360,7 @@ class IdeLanguageNames {
     for (final language in _textMateLanguages) {
       add(language.id, language.aliases, language.extensions);
     }
-    for (final registration in _registrations ?? const []) {
+    for (final registration in _loadedRegistrations) {
       add(registration.id, registration.aliases, registration.extensions);
     }
     final all = [
@@ -374,7 +379,7 @@ class IdeLanguageNames {
         return language.aliases.first;
       }
     }
-    for (final registration in _registrations ?? const []) {
+    for (final registration in _loadedRegistrations) {
       if (registration.id == id && registration.aliases.isNotEmpty) {
         return registration.aliases.first;
       }

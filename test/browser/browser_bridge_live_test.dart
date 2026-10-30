@@ -411,14 +411,14 @@ void main() {
       );
       final sharedTabs = await connection.call('tabs.query', [{}]) as List;
       // The window's first tab, about:blank, is not shared: left out.
-      expect([for (final Map tab in sharedTabs) tab['id']], [tabId]);
+      expect([for (final tab in sharedTabs.cast<Map>()) tab['id']], [tabId]);
       final windows = await connection.call('windows.getAll', [
         {'populate': true},
       ]) as List;
       expect(
         [
-          for (final Map window in windows)
-            for (final Map tab in window['tabs'] as List) tab['id'],
+          for (final window in windows.cast<Map>())
+            for (final tab in (window['tabs'] as List).cast<Map>()) tab['id'],
         ],
         [tabId],
       );
@@ -487,7 +487,7 @@ void main() {
                   as Map)['tabId']
               as int;
       final nowShared = await connection.call('tabs.query', [{}]) as List;
-      expect([for (final Map tab in nowShared) tab['id']], contains(popTab));
+      expect([for (final tab in nowShared.cast<Map>()) tab['id']], contains(popTab));
       await connection.call('tabs.remove', [popTab]);
       await call('browser_close', {'tabId': tabId});
     },

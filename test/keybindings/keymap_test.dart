@@ -62,7 +62,7 @@ void main() {
     test('names', () {
       String name(String id) =>
           (jsonDecode(File(KeymapCatalog.assetPath(id)).readAsStringSync())
-              as Map)['name'];
+              as Map)['name'] as String;
       expect(name('ms-vscode.atom-keybindings'), 'Atom');
       expect(name('k--kato.intellij-idea-keybindings'), 'IntelliJ IDEA');
       expect(name('ms-vscode.sublime-keybindings'), 'Sublime Text');

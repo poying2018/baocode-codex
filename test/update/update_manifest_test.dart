@@ -98,7 +98,7 @@ void main() {
               ),
             },
           ),
-        ),
+        ) as Map<String, Object?>,
         'downloads': {
           'macos': {'url': 'https://github.com/poying2018/baocode-codex/releases/download/v1.2.0/x.dmg', 'size': 1},
         },

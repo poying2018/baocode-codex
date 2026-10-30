@@ -180,7 +180,12 @@ git merge upstream/main --no-edit
   134 MB，退出码 0）。**发版仍然在 CI**（`release.yml` 里 `choco install innosetup`）。
 - **`flutter analyze` 会卡住**（同日实测）：`flutter` 工具启动时去 GitHub 查更新，
   本机直连超时、又不走代理，进程停在 0% CPU。用 `dart analyze`（同一套规则，
-  实测 0 error / 0 warning）。
+  实测 0 error / 0 warning）。从沙箱里跑时要像测试那样重定向 `APPDATA`、`LOCALAPPDATA`、
+  `TEMP`，否则分析服务器起不来，只报 `Bad state: The analysis server crashed unexpectedly`。
+- **类型检查更严**：`analysis_options.yaml` 开了 `strict-casts`（2026-10-30）。隐式转换在
+  这里算 error，`dart analyze` 会红，CI 的 analyze job 因此挡住发版。新写的代码里从
+  `dynamic`/`Map` 取值要显式 `as`，或者用带类型的模式（`if (key case final String name)`）。
+  上游带进隐式转换时同样会红——要么顺手修好，要么临时去掉这一行。
 - **远端服务器的 Linux 版编不了**：`dart compile exe --target-os linux` 要联网下载
   AOT 运行时。CI 上有。
 - **沙箱**：从 DSH 里起的应用写不了工作区以外的地方（`%APPDATA%`、`~\.codex` 会 errno 5），

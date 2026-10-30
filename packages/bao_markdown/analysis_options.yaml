@@ -1,5 +1,9 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
+  # As the repository's own analysis_options.yaml: an implicit cast is a
+  # runtime check nobody asked for.
+  language:
+    strict-casts: true
   exclude:
     - build/**

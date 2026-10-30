@@ -291,7 +291,8 @@ class AgentEngine {
 
   /// Tells the host its pending requests are moot (the turn stopped).
   void _cancelHostRequests() {
-    for (final MapEntry(key: id, value: done) in [..._pending.entries]) {
+    final pending = Map<String, Completer<Map<String, Object?>>>.of(_pending);
+    for (final MapEntry(key: id, value: done) in pending.entries) {
       _send({'type': 'control_cancel_request', 'request_id': id});
       _pending.remove(id);
       if (!done.isCompleted) done.completeError(const Cancelled('interrupted'));

@@ -843,7 +843,9 @@ Future<String> _objectSnapshot(BrowserTab tab) async {
     'Node.prototype',
     _detachedTrees,
   ) as List).cast<List>();
-  final counts = {for (final [name, n] in counted) name as String: n as int};
+  final counts = {
+    for (final [name, n] in counted.cast<List>()) name as String: n as int,
+  };
   final detached = trees.fold(0, (sum, t) => sum + (t[1] as int));
   String count(int n) => n.toString().replaceAllMapped(
     RegExp(r'\B(?=(\d{3})+(?!\d))'),

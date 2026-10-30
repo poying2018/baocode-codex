@@ -10,6 +10,12 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
+  language:
+    # An implicit cast is a runtime check that was never asked for, and one
+    # that fails throws where the code looks type-safe (two of these turned
+    # a bool test into a TypeError waiting for its data). Errors fail
+    # analyze, so CI stops a release on a new one.
+    strict-casts: true
   exclude:
     - build/**
     - macos/**

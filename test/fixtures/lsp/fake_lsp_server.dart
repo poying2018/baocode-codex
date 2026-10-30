@@ -317,12 +317,12 @@ Future<Object?> _answer(String method, Map<String, Object?> params) async {
       final uri = (params['textDocument'] as Map)['uri'] as String;
       final text = _docs[uri] ?? '';
       final range = params['range'] as Map?;
+      final start = (range?['start'] as Map?)?['line'] as num?;
+      final end = (range?['end'] as Map?)?['line'] as num?;
       final edits = <Object?>[];
       final lines = _lines(text);
       for (var line = 0; line < lines.length; line++) {
-        if (range != null &&
-            (line < (range['start'] as Map)['line']! ||
-                line > (range['end'] as Map)['line']!)) {
+        if (range != null && (line < start! || line > end!)) {
           continue;
         }
         final content = lines[line];

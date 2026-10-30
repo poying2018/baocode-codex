@@ -776,7 +776,9 @@ class ModelProvider {
       headers: {
         if (json['headers'] case final Map headers)
           for (final MapEntry(:key, :value) in headers.entries)
-            if (isHeaderName(key) && value != null) key: '$value',
+            if (key case final String name
+                when isHeaderName(name) && value != null)
+              name: '$value',
       },
       accounts: [
         for (final account in json['accounts'] as List? ?? const [])

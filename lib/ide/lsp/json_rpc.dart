@@ -250,7 +250,7 @@ class JsonRpcConnection {
   void _closed() {
     if (_isClosed) return;
     _isClosed = true;
-    for (final MapEntry(:value) in [..._pending.entries]) {
+    for (final value in Map<Object, _Pending>.of(_pending).values) {
       value.finish();
       value.completer.completeError(JsonRpcClosed(value.method));
     }
@@ -359,7 +359,7 @@ class JsonRpcConnection {
     final method = message['method'];
     if (method is String) {
       if (id is String || id is num) {
-        unawaited(_handleRequest(id!, method, message['params']));
+        unawaited(_handleRequest(id as Object, method, message['params']));
       } else {
         _handleNotification(method, message['params']);
       }
@@ -384,7 +384,10 @@ class JsonRpcConnection {
   void _handleNotification(String method, Object? params) {
     if (method == r'$/cancelRequest') {
       final id = params is Map ? params['id'] : null;
-      if (id != null && _incoming.containsKey(id)) _incoming[id] = true;
+      if (id != null) {
+        final requestId = id as Object;
+        if (_incoming.containsKey(requestId)) _incoming[requestId] = true;
+      }
       return;
     }
     final handler = _notificationHandlers[method];
