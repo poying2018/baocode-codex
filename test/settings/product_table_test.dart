@@ -6,36 +6,42 @@
 // one fact, from which everything else follows. These are the tests of
 // that: the table the rest follows from, and the places that take the
 // product's name.
+import 'dart:io';
+
 import 'package:baocode/platform/app_paths.dart';
 import 'package:baocode/update/update_manifest.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' as p;
+
+/// Where a program named [name] would be on this machine. The product is
+/// read from the file's own name, and a Windows path handed to a runner on
+/// another platform has no separator that platform's `basename` knows: the
+/// whole string is then the file's name.
+String program(String name) => p.join(
+  Platform.isWindows ? r'C:\Program Files\BaoCode' : '/opt/BaoCode',
+  name,
+);
 
 void main() {
   group('the product a build is', () {
     test('is said by the name of its executable', () {
-      expect(
-        AppPaths.product(r'C:\Program Files\BaoCode\baocode-claude.exe'),
-        'baocode',
-      );
-      expect(
-        AppPaths.product(r'C:\Program Files\BaoCode\baocode-codex.exe'),
-        'baocode-codex',
-      );
+      expect(AppPaths.product(program('baocode-claude.exe')), 'baocode');
+      expect(AppPaths.product(program('baocode-codex.exe')), 'baocode-codex');
       // The name it had before the rename still names it: a copy of the
       // old program is the same product.
-      expect(AppPaths.product(r'C:\Program Files\BaoCode\baocode.exe'), 'baocode');
+      expect(AppPaths.product(program('baocode.exe')), 'baocode');
     });
 
     test('of a name belonging to no product is the Claude Code one\'s', () {
       // A test host, a build named otherwise.
-      expect(AppPaths.product(r'C:\tmp\flutter_tester.exe'), 'baocode');
+      expect(AppPaths.product(program('flutter_tester.exe')), 'baocode');
       // A name with a space in it is no product's (macOS's ".app" folder).
       expect(AppPaths.product('/Applications/BaoCode Codex.app'), 'baocode');
     });
 
     test('keeps each product\'s own identity', () {
-      final baocode = AppPaths.productOf(r'C:\BaoCode\baocode-claude.exe');
-      final codex = AppPaths.productOf(r'C:\BaoCode\baocode-codex.exe');
+      final baocode = AppPaths.productOf(program('baocode-claude.exe'));
+      final codex = AppPaths.productOf(program('baocode-codex.exe'));
       expect(baocode.displayName, 'BaoCode Claude');
       expect(codex.displayName, 'BaoCode Codex');
       // The scheme, the registration, the update channel: each product's

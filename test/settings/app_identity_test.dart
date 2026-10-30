@@ -1,6 +1,8 @@
 @TestOn('mac-os || linux || windows')
 library;
 
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:baocode/platform/app_paths.dart';
 import 'package:baocode/platform/data_dir.dart';
@@ -18,6 +20,14 @@ void main() {
     'USERPROFILE': '/home',
     'HOME': '/home',
   };
+  // Where this platform puts that data: APPDATA is Windows' own, and a
+  // runner on Linux or macOS reads the home instead — the folder the app
+  // picks is the platform's choice, so the expectation follows it.
+  final dataRoot = Platform.isWindows
+      ? '/appdata'
+      : Platform.isMacOS
+      ? p.join('/home', 'Library', 'Application Support')
+      : p.join('/home', '.config');
 
   test('the data folder of a copy with an id is its own', () {
     expect(p.basename(DataDirectory.defaultPath(withId)), 'baocode-dev');
@@ -43,7 +53,7 @@ void main() {
     // The pointer the installed one wrote is not this copy's: it goes to
     // its own folder, the one the platform has for it.
     expect(resolution.source, DataDirectorySource.defaultLocation);
-    expect(resolution.path, p.join('/appdata', 'baocode-dev'));
+    expect(resolution.path, p.join(dataRoot, 'baocode-dev'));
   });
 
   test('a product named by its executable keeps its data apart', () {
@@ -51,17 +61,17 @@ void main() {
     // are its own: the Claude Code product's are untouched.
     expect(
       AppPaths.dataDir(platform, executable: 'baocode-codex.exe'),
-      p.join('/appdata', 'baocode-codex'),
+      p.join(dataRoot, 'baocode-codex'),
     );
     expect(
       AppPaths.dataDir(platform, executable: 'baocode.exe'),
-      p.join('/appdata', 'baocode'),
+      p.join(dataRoot, 'baocode'),
     );
     // A name belonging to no product (a test host, a build named
     // otherwise) is BaoCode's.
     expect(
       AppPaths.dataDir(platform, executable: 'flutter_tester.exe'),
-      p.join('/appdata', 'baocode'),
+      p.join(dataRoot, 'baocode'),
     );
   });
 
