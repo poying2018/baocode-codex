@@ -21,10 +21,15 @@ import 'package:path/path.dart' as p;
 
 void main() {
   final chrome = Platform.environment['BAO_BROWSER_LIVE'];
-  final host = p.absolute(
-    'build/macos/Build/Products/Debug/BaoCode.app/Contents/MacOS/'
-    'baocode-browser-host',
-  );
+  // The native messaging host to point the browser at: the build this
+  // repository makes on the machine the test runs on. A mac build's inside
+  // the app bundle; a Windows one beside the app in the runner's output,
+  // or said with BAO_BROWSER_HOST.
+  final host = Platform.environment['BAO_BROWSER_HOST'] ??
+      p.absolute(
+        'build/macos/Build/Products/Debug/BaoCode.app/Contents/MacOS/'
+        'baocode-browser-host',
+      );
 
   test(
     'an agent opens, reads, clicks, types and shoots a page through the extension',
@@ -110,7 +115,7 @@ void main() {
       final page = 'http://127.0.0.1:${server.port}/';
 
       // Short: a socket's path has a hundred bytes or so.
-      final sockets = Directory('/tmp').createTempSync('bao-');
+      final sockets = Directory.systemTemp.createTempSync('bao-browser-');
       addTearDown(() => sockets.deleteSync(recursive: true));
       BrowserBridge.socketFolder = sockets.path;
       final bridge = BrowserBridge.instance;
@@ -131,7 +136,16 @@ void main() {
           '--force-device-scale-factor=2',
           'about:blank',
         ],
-        environment: {'TMPDIR': sockets.path, 'XDG_RUNTIME_DIR': sockets.path},
+        // The host the browser starts reads the folder from the user's
+        // temporary directory: its own name on each platform, and this
+        // test's folder rather than the user's, so that the user's browsers
+        // never find the socket.
+        environment: {
+          'TMPDIR': sockets.path,
+          'XDG_RUNTIME_DIR': sockets.path,
+          'TEMP': sockets.path,
+          'TMP': sockets.path,
+        },
       );
       addTearDown(() {
         browser.kill();
