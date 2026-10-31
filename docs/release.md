@@ -5,6 +5,10 @@ BaoCode 的版本号怎么定、一个版本怎么发出去、发到哪里、已
 > **这个 fork 只发 Windows 版。** 下面的流程大多是上游的（`dl.baocode.dev`、Cloudflare R2、
 > macOS 公证、Linux 包）：**本仓库不发布到那里，也不构建那些**。本仓库的下载与更新
 > 都在自己的 GitHub Releases 上，见第 1 节末尾的对照表。
+>
+> **本仓库自己的发布流程**（tag → CI → GitHub Releases，每条流水线、发完核对什么、
+> 常见故障）整理在 [release-codex.md](release-codex.md)；下面保留的是上游的完整流程，
+> 供对照与借用。
 
 - 下载与更新：`https://github.com/poying2018/baocode-codex/releases`
   （`latest-codex.json` 挂在 `releases/latest/download/` 下，应用读它；`dl.baocode.dev`

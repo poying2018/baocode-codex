@@ -118,6 +118,8 @@ cd F:\Projects\baocode-codex-dev
 
 ## 更新链
 
+发一个版本的完整步骤与 CI 流水线的说明见 [release-codex.md](release-codex.md)。
+
 应用从本仓库的 release 取自己的下一版：
 
 ```
