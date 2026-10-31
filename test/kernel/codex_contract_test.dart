@@ -103,6 +103,7 @@ void main() {
       containsAll(const ['model/list', 'turn/start']),
     );
     expect(transport.methods, contains('turn/start'));
+    // ignore: avoid_print
     print('the kernel asked: ${transport.methods.toSet().toList()..sort()}');
   });
 }
