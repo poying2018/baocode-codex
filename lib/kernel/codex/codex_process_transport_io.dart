@@ -11,7 +11,11 @@ import 'codex_transport.dart';
 /// `codex app-server` as a local process: JSON-RPC 2.0 over its stdio, one
 /// message per line.
 class ProcessCodexTransport implements CodexTransport {
-  ProcessCodexTransport._(this._process, {required this.executable}) {
+  ProcessCodexTransport._(
+    this._process, {
+    required this.executable,
+    required this._home,
+  }) {
     _process.stdout
         .transform(const Utf8Decoder(allowMalformed: true))
         .transform(const LineSplitter())
@@ -30,23 +34,34 @@ class ProcessCodexTransport implements CodexTransport {
         }
         _waiting.clear();
         // It ended before it was up: the one waiting to talk to it is
-        // told, rather than waiting for nothing.
+        // told, rather than waiting for nothing. What it said on stderr
+        // is the truth of why; the folder-lock guess is only made when
+        // its own words say a folder was held.
         if (!_started.isCompleted) {
-          _started.completeError(
-            const CodexUnavailable(
-              'Codex ended before it was ready',
-              detail: 'Another Codex may be running and holding its folder.',
-            ),
-          );
+          _started.completeError(_whyItEnded());
         }
         if (!_finished.isCompleted) _finished.complete();
       }),
     );
   }
 
-  /// Starts `codex app-server` for [launch].
+  /// Starts `codex app-server` for [launch]: once, and once more if the
+  /// first try ends before it was up — a maintenance pass in the folder,
+  /// or a file still being written out, is over by then.
   static Future<ProcessCodexTransport> start(CodexLaunch launch) async {
     final cli = await locateCodex();
+    try {
+      return await _startUp(cli, launch);
+    } on CodexUnavailable {
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+      return _startUp(cli, launch);
+    }
+  }
+
+  static Future<ProcessCodexTransport> _startUp(
+    CodexExecutable cli,
+    CodexLaunch launch,
+  ) async {
     final transport = await _start(cli, launch);
     // The server waits for the client to speak first: the initialize
     // request. It is said here, so that the server being up is known
@@ -63,8 +78,8 @@ class ProcessCodexTransport implements CodexTransport {
       },
     });
     // The server may not come up: another app may hold its home (the
-    // Codex Desktop app does), and it says so and ends. The user would
-    // wait for nothing, so it is said now.
+    // Codex Desktop app does), or it may fail for its own reason. What
+    // it said on stderr is the truth; the timeout says so too.
     await transport._started.future.timeout(
       const Duration(seconds: 10),
       onTimeout: () {
@@ -72,8 +87,8 @@ class ProcessCodexTransport implements CodexTransport {
         throw const CodexUnavailable(
           'Codex did not start',
           detail:
-              'Another Codex may be running and holding its folder. Close '
-              'it and try again.',
+              'It did not answer within ten seconds. Its latest words are '
+              'in codex-stderr.log next to its state.',
         );
       },
     );
@@ -84,6 +99,16 @@ class ProcessCodexTransport implements CodexTransport {
     CodexExecutable cli,
     CodexLaunch launch,
   ) async {
+    // The log of this start replaces the last one's: what is read there
+    // is about the attempt at hand.
+    final home = launch.home;
+    if (home != null && home.isNotEmpty) {
+      try {
+        File(p.join(home, 'codex-stderr.log')).writeAsStringSync('');
+      } on FileSystemException {
+        // A log that cannot be started is not a reason not to start.
+      }
+    }
     try {
       final process = await Process.start(
         cli.executable,
@@ -103,7 +128,11 @@ class ProcessCodexTransport implements CodexTransport {
         // shell concatenates its arguments rather than escaping them, so
         // a path with a space in it is split and the server never starts.
       );
-      return ProcessCodexTransport._(process, executable: cli.executable);
+      return ProcessCodexTransport._(
+        process,
+        executable: cli.executable,
+        home: launch.home ?? '',
+      );
     } on ProcessException catch (error) {
       throw CodexUnavailable(
         'Codex could not start',
@@ -306,6 +335,10 @@ class ProcessCodexTransport implements CodexTransport {
   /// The CLI run, to name in a report of its failing.
   final String executable;
 
+  /// The state folder the server was given, whose side holds its stderr
+  /// log; empty when it was given none.
+  final String _home;
+
   final Completer<void> _finished = Completer<void>();
   final Completer<void> _started = Completer<void>();
 
@@ -393,6 +426,41 @@ class ProcessCodexTransport implements CodexTransport {
   void _stderrLine(String line) {
     _stderr.add(line);
     if (_stderr.length > _stderrLines) _stderr.removeAt(0);
+    // Kept beside the state, so that a start that fails leaves why it
+    // failed even after this process object is gone.
+    final home = _home;
+    if (home.isEmpty) return;
+    try {
+      File(p.join(home, 'codex-stderr.log'))
+          .writeAsStringSync('$line\n', mode: FileMode.append, flush: false);
+    } on FileSystemException {
+      // A log that cannot be written is not a reason to fail harder.
+    }
+  }
+
+  /// Why the process ended before it was up, from its own words on
+  /// stderr: the folder-lock guess is made only when it said something
+  /// like a lock or a database held; otherwise what it said is carried
+  /// to the user as-is.
+  CodexUnavailable _whyItEnded() {
+    final said = _stderr.join('\n').trim();
+    final tail = said.length <= 600 ? said : said.substring(said.length - 600);
+    final lockWords = RegExp(
+      r'lock|database|holding|in use|busy|another (codex|process)',
+      caseSensitive: false,
+    );
+    if (tail.isNotEmpty && lockWords.hasMatch(tail)) {
+      return CodexUnavailable(
+        'Codex ended before it was ready',
+        detail: 'Another Codex may be running and holding its folder.\n$tail',
+      );
+    }
+    return CodexUnavailable(
+      'Codex ended before it was ready',
+      detail: tail.isEmpty
+          ? 'It said nothing before it ended.'
+          : 'What Codex said before it ended:\n$tail',
+    );
   }
 
   void _stdoutDone() {
