@@ -53,6 +53,9 @@ class MockCodexTransport implements CodexTransport {
   int _requests = 0;
   int _items = 0;
   int _turns = 0;
+
+  /// The model each turn asked for, in order, as it was asked.
+  final List<String?> modelsAsked = [];
   int _serverRequests = 0;
   int _tokens = 18400;
 
@@ -151,6 +154,9 @@ class MockCodexTransport implements CodexTransport {
         });
       case 'turn/start':
         final turnId = 'turn_${++_turns}';
+        // The model the turn asked for, as it was asked: a test reads it
+        // to prove what the kernel sends is the upstream's own name.
+        modelsAsked.add(params['model'] as String?);
         _respond(id, {
           'turn': {'id': turnId, 'status': 'inProgress'},
         });

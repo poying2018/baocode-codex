@@ -25,10 +25,11 @@ void main() {
     final was = ModelProviders.current;
     ModelProviders.current = providers;
     addTearDown(() => ModelProviders.current = was);
+    final mock = MockCodexTransport();
 
     final kernel = CodexKernel(
       MockKernels.codex,
-      MockCodexTransport(),
+      mock,
       context: KernelContext(
         settings: {KernelChoiceKind.model.name: '@deepseek/deepseek-chat'},
       ),
@@ -38,5 +39,9 @@ void main() {
     await Future<void>.delayed(const Duration(seconds: 1));
     expect(kernel.health.status, isNot(KernelHealthStatus.failed),
         reason: 'the upstream switch must not break the kernel');
+    // The turn asks for the model as the upstream serves it, not by the
+    // app's reference for the pick: the server has no metadata for the
+    // reference, and refuses the turn over it.
+    expect(mock.modelsAsked.last, 'deepseek-chat');
   });
 }

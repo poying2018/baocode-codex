@@ -229,7 +229,16 @@ class CodexKernel
   }
 
   /// What is in effect: the pick, or the first offered when nothing is.
-  String? get _modelSelected => _pickedModel ?? _modelOptions.firstOrNull?.id;
+  /// On one of the user's own upstreams the name is the model as that
+  /// upstream serves it (`dfmodel`), not the app's reference for the
+  /// pick (`@provider/qoder-cn/dfmodel`) — the server knows its own by
+  /// the short name, and the reference is not a model to it.
+  String? get _modelSelected {
+    final picked = _pickedModel ?? _modelOptions.firstOrNull?.id;
+    final upstream = _upstream;
+    if (upstream == null) return picked;
+    return parseModelRef(picked) == null ? picked : upstream.modelId;
+  }
 
   /// Picks [id] for this conversation. The turn asks for it by name; the
   /// effort and the service tier are the ones that model takes.

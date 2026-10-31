@@ -116,6 +116,10 @@ class ProcessCodexTransport implements CodexTransport {
         workingDirectory: launch.cwd,
         environment: {
           ...?cli.environment,
+          // What the launch carries: an upstream of the user's own sends
+          // its key this way (the one `env_key` names), never through the
+          // configuration.
+          ...?launch.environment,
           // Its own state, when it was given one: the user's own
           // folder may be held by another Codex.
           'CODEX_HOME': ?launch.home,
