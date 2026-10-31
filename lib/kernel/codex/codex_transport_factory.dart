@@ -46,7 +46,11 @@ abstract final class CodexTransportFactory {
     }
     await Future.wait([
       for (final transport in live)
-        transport.exited.timeout(const Duration(seconds: 3), onTimeout: () {}),
+        // Fifteen seconds, not three: the server's databases are written
+        // out as it goes down, and an upgrade that starts before that has
+        // finished leaves the new app's first server facing the old one's
+        // locks.
+        transport.exited.timeout(const Duration(seconds: 15), onTimeout: () {}),
     ]);
     _shared.clear();
   }
@@ -74,12 +78,19 @@ abstract final class CodexTransportFactory {
     final home = _home();
     _seed(home);
     // One process per upstream: its configuration is fixed when it starts.
+    // An upstream's server also keeps its state in a folder of its own —
+    // two servers sharing one CODEX_HOME refuse to start together (the
+    // databases are locked while either runs), and the second one's error
+    // is what the user saw as "another Codex is running".
+    final upstreamHome =
+        upstream == null ? home : p.join('$home-upstreams', upstream.id);
+    _seed(upstreamHome);
     final key = upstream == null ? home : '$home#${upstream.id}';
     return _shared.putIfAbsent(
       key,
       () => _StartingCodexTransport(
         () => startCodexProcess(
-          launchOn(CodexLaunch(cwd: cwd, home: home), upstream),
+          launchOn(CodexLaunch(cwd: cwd, home: upstreamHome), upstream),
         ),
       ),
     );
