@@ -134,6 +134,11 @@ threadId, clientUserMessageId, input[], model, effort?, serviceTierForTurn?,
 approvalPolicy, sandboxPolicy
 ```
 
+> **与 CLI 版本对齐（2026-10-31，CLI 0.166）**：上面全部 method、`turn/start` 的参数字段、
+> 服务端的 28 个通知与 12 种 item 类型，都对照 CLI 自己生成的协议 schema
+> （`codex app-server generate-json-schema --out <目录>`）核对过，全部存在。
+> 这个核对已固化为 `test/kernel/codex_contract_test.dart`：内核被记录在首回合实际发出
+> `model/list → thread/start → turn/start`，服务端改名时测试即红。
 - `input[]` 是 `UserInput[]`：`{'type':'text','text':…}` 与
   `{'type':'image','url':'data:…;base64,…'}`。**计划模式的说明也是一条 text**
   （`_planNote`，见 §4）。
