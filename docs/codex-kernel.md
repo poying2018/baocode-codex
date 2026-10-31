@@ -99,6 +99,9 @@ CLI 输出
 
 ## 3. 协议契约
 
+> 文中的行号是写作时的快照，源码会动；**以函数名与类名为锚**（`_turnRequest`、
+> `_receive`、`_ensureThread`…），行号只当提示。
+
 **这份契约在源码里是散落的裸字符串，没有集中的常量表。** 下表是当前的完整清单，
 改动 CLI 协议时先对照这里。
 
@@ -106,26 +109,26 @@ CLI 输出
 
 | method | 参数 | 位置 | 用途 |
 | --- | --- | --- | --- |
-| `initialize` | `clientInfo`、`capabilities.experimentalApi` | `codex_process_transport_io.dart:53` | 握手；**服务端的 `initialized` 通知在收到结果后发** |
-| `thread/start` | `cwd`、`model`、`serviceTier`、`developerInstructions` | L657、L1393 | 新会话 |
-| `thread/resume` | 同上 + `threadId`、`excludeTurns:true` | L642 | 继续旧会话（历史另取，见下） |
-| `thread/fork` | `threadId`、`lastTurnId?`、`cwd`、`excludeTurns:true` | L1320 | 复制会话 |
-| `thread/name/set` | `threadId`、`name` | L1332、L1357 | 改名 |
-| `thread/revert` | `threadId`、`beforeTurnId` | L1411 | 回退到某一轮 |
-| `thread/turns/list` | `threadId`、`limit`、`cursor?`、`itemsView:'full'`、`sortDirection` | L934、L956 | 读历史（分页） |
-| `thread/list` | `cwd?`、`limit`、`sortKey` | `codex_catalog.dart:84` | 会话目录 |
-| `thread/delete` | `threadId` | `codex_catalog.dart:72` | 删会话 |
-| `turn/start` | 见下 | L569 | 开始一轮 |
-| `turn/interrupt` | `threadId`、`turnId` | L746 | 打断 |
-| `review/start` | `threadId`、`delivery:'inline'`、`target` | L558 | `/review` |
-| `thread/compact/start` | `threadId` | L549 | `/compact` |
-| `model/list` | `limit`、`cursor?` | L757 | 模型目录（分页） |
-| `mcpServerStatus/list` | `threadId?` | L1439 | MCP 服务器 |
-| `mcpServer/oauth/login` | `name`、`threadId` | L1513 | 给 MCP 服务器登录 |
-| `config/value/write` | `keyPath`、`mergeStrategy`、`value` | L1484 | 改配置（如启停 MCP） |
-| `config/mcpServer/reload` | — | L1489 | 重载 MCP |
-| `account/rateLimits/read` | — | L1591 | 账号配额 |
-| `fuzzyFileSearch` | `query`、`roots` | L1547 | `@` 文件建议 |
+| `initialize` | `clientInfo`、`capabilities.experimentalApi` | `codex_process_transport_io.dart` 的 `start()` | 握手；**服务端的 `initialized` 通知在收到结果后发** |
+| `thread/start` | `cwd`、`model`、`serviceTier`、`developerInstructions` | `_ensureThread()` | 新会话 |
+| `thread/resume` | 同上 + `threadId`、`excludeTurns:true` | `_ensureThread()` | 继续旧会话（历史另取，见下） |
+| `thread/fork` | `threadId`、`lastTurnId?`、`cwd`、`excludeTurns:true` | `fork()` | 复制会话 |
+| `thread/name/set` | `threadId`、`name` | `rename()` | 改名 |
+| `thread/revert` | `threadId`、`beforeTurnId` | `revert()` | 回退到某一轮 |
+| `thread/turns/list` | `threadId`、`limit`、`cursor?`、`itemsView:'full'`、`sortDirection` | `_turns()` | 读历史（分页） |
+| `thread/list` | `cwd?`、`limit`、`sortKey` | `codex_catalog.dart` 的 `_threads()` | 会话目录 |
+| `thread/delete` | `threadId` | `codex_catalog.dart` 的 `delete()` | 删会话 |
+| `turn/start` | 见下 | `_turnRequest()` | 开始一轮 |
+| `turn/interrupt` | `threadId`、`turnId` | `_interrupt()` | 打断 |
+| `review/start` | `threadId`、`delivery:'inline'`、`target` | `_turnRequest()` | `/review` |
+| `thread/compact/start` | `threadId` | `_turnRequest()` | `/compact` |
+| `model/list` | `limit`、`cursor?` | `_loadModels()` | 模型目录（分页） |
+| `mcpServerStatus/list` | `threadId?` | `_mcpServers()` | MCP 服务器 |
+| `mcpServer/oauth/login` | `name`、`threadId` | `_mcpLogin()` | 给 MCP 服务器登录 |
+| `config/value/write` | `keyPath`、`mergeStrategy`、`value` | `_mcpWrite()` | 改配置（如启停 MCP） |
+| `config/mcpServer/reload` | — | `_mcpReload()` | 重载 MCP |
+| `account/rateLimits/read` | — | `_rateLimits()` | 账号配额 |
+| `fuzzyFileSearch` | `query`、`roots` | `_suggestFiles()` | `@` 文件建议 |
 
 `turn/start` 的参数（`codex_kernel.dart:569`）：
 
