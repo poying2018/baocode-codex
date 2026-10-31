@@ -30,6 +30,19 @@
   <h1>更新日志</h1>
   <p class="subtitle">BaoCode 每个版本的变化。</p>
 
+  <section class="release" id="v1.7.9">
+    <h2 class="plain"><a href="#v1.7.9">1.7.9</a></h2>
+    <p>BaoCode Codex 1.7.9：会话中途换模型真正生效</p>
+    <p>1.7.8 里模型名的解析取自「上一回合用的服务器」，而那个服务器的模型是启动时
+    固化的——会话中途换模型，请求里仍是旧名字。这正是「无法在会话中途更换模型」。</p>
+    <p>修复</p>
+    <ul>
+    <li>生效的模型名从<strong>当下所选</strong>即时解析：换选后下一回合（包括排队中的）直接问
+    新模型。</li>
+    <li>测试：mock 记录每回合询问的模型名，断言中途换选后回合按新名询问。</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.8">
     <h2 class="plain"><a href="#v1.7.8">1.7.8</a></h2>
     <p>BaoCode Codex 1.7.8：自定义上游的两个尾巴</p>
