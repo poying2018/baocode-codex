@@ -247,28 +247,28 @@ Root: HKA; Subkey: "Software\Classes\{#ProductScheme}\shell\open\command"; \
 ; Each product has a key of its own (ProductBrowserHost), so that the
 ; extension of one does not talk to the other.
 Root: HKA; Subkey: "Software\Google"; ValueType: none; \
-  Flags: uninsdeletekeyifempty
+  Flags: uninsdeletekeyifempty; Check: BrowserHostsAllowed
 Root: HKA; Subkey: "Software\Google\Chrome"; ValueType: none; \
-  Flags: uninsdeletekeyifempty
+  Flags: uninsdeletekeyifempty; Check: BrowserHostsAllowed
 Root: HKA; Subkey: "Software\Google\Chrome\NativeMessagingHosts"; \
-  ValueType: none; Flags: uninsdeletekeyifempty
+  ValueType: none; Flags: uninsdeletekeyifempty; Check: BrowserHostsAllowed
 Root: HKA; Subkey: "Software\Google\Chrome\NativeMessagingHosts\{#ProductBrowserHost}"; \
   ValueType: string; ValueName: ""; \
-  ValueData: "{app}\{#ProductBrowserManifest}"; Flags: uninsdeletekey
+  ValueData: "{app}\{#ProductBrowserManifest}"; Flags: uninsdeletekey; Check: BrowserHostsAllowed
 Root: HKA; Subkey: "Software\Microsoft\Edge"; ValueType: none; \
-  Flags: uninsdeletekeyifempty
+  Flags: uninsdeletekeyifempty; Check: BrowserHostsAllowed
 Root: HKA; Subkey: "Software\Microsoft\Edge\NativeMessagingHosts"; \
-  ValueType: none; Flags: uninsdeletekeyifempty
+  ValueType: none; Flags: uninsdeletekeyifempty; Check: BrowserHostsAllowed
 Root: HKA; Subkey: "Software\Microsoft\Edge\NativeMessagingHosts\{#ProductBrowserHost}"; \
   ValueType: string; ValueName: ""; \
-  ValueData: "{app}\{#ProductBrowserManifest}"; Flags: uninsdeletekey
+  ValueData: "{app}\{#ProductBrowserManifest}"; Flags: uninsdeletekey; Check: BrowserHostsAllowed
 Root: HKA; Subkey: "Software\Chromium"; ValueType: none; \
-  Flags: uninsdeletekeyifempty
+  Flags: uninsdeletekeyifempty; Check: BrowserHostsAllowed
 Root: HKA; Subkey: "Software\Chromium\NativeMessagingHosts"; \
-  ValueType: none; Flags: uninsdeletekeyifempty
+  ValueType: none; Flags: uninsdeletekeyifempty; Check: BrowserHostsAllowed
 Root: HKA; Subkey: "Software\Chromium\NativeMessagingHosts\{#ProductBrowserHost}"; \
   ValueType: string; ValueName: ""; \
-  ValueData: "{app}\{#ProductBrowserManifest}"; Flags: uninsdeletekey
+  ValueData: "{app}\{#ProductBrowserManifest}"; Flags: uninsdeletekey; Check: BrowserHostsAllowed
 ; Unticked: what an earlier install added goes.
 Root: HKA; Subkey: "Software\Classes\*\shell\{#ProductKey}"; ValueType: none; \
   Tasks: not contextmenu; Flags: deletekey; Check: ClassesAllowed
@@ -349,6 +349,39 @@ begin
     Result := ProbeKey(HKEY_LOCAL_MACHINE, 'Software\Classes\*\shell')
   else
     Result := ProbeKey(HKEY_CURRENT_USER, 'Software\Classes\*\shell');
+end;
+
+/// Whether the browsers' native-messaging registrations can be written —
+/// Chrome, Edge and Chromium's, the same kind of key in the same hive. One
+/// is probed for all three: what refuses one refuses them together, and the
+/// app does not work without a browser host only when none is there.
+var
+  BrowserHostsAsked: Boolean;
+  BrowserHostsWritable: Boolean;
+
+/// The browsers' registrations, as [Check] wants it: a function, not a
+/// value.
+function BrowserHostsAllowed: Boolean;
+begin
+  if IsUninstaller then
+    Result := True
+  else
+  begin
+    if not BrowserHostsAsked then
+    begin
+      if IsAdminInstallMode then
+        BrowserHostsWritable := ProbeKey(HKEY_LOCAL_MACHINE,
+          'Software\Google\Chrome')
+      else
+        BrowserHostsWritable := ProbeKey(HKEY_CURRENT_USER,
+          'Software\Google\Chrome');
+      BrowserHostsAsked := True;
+      if not BrowserHostsWritable then
+        Log('The browsers'' native-messaging keys cannot be written: they ' +
+            'are skipped');
+    end;
+    Result := BrowserHostsWritable;
+  end;
 end;
 
 /// The Start Menu's, as [Check] wants it: a function, not a value.
@@ -474,4 +507,5 @@ begin
   end;
   Result := Pos(';' + Uppercase(Param) + ';', ';' + Uppercase(Path) + ';') = 0;
 end;
+
 
