@@ -30,6 +30,22 @@
   <h1>更新日志</h1>
   <p class="subtitle">BaoCode 每个版本的变化。</p>
 
+  <section class="release" id="v1.7.2">
+    <h2 class="plain"><a href="#v1.7.2">1.7.2</a></h2>
+    <p>BaoCode Codex 1.7.2：安装在哪里都能成</p>
+    <p>这一版修的是安装器最后的死角。上一版让「开始菜单」「右键菜单」写不了时跳过而不回滚，
+    但浏览器的注册键（Chrome、Edge、Chromium 的原生消息宿主）漏了——有的机器会拒绝写入，
+    安装就在 <code>Software\Google</code> 这里整个回滚，程序明明已经装完也一起被删掉。</p>
+    <p>修复</p>
+    <ul>
+    <li><strong>浏览器的注册键也纳入容错</strong>：写不了就跳过（装完后应用会再说浏览器扩展的事），
+    不再让整个安装回滚。到这一版，安装脚本里<strong>每一项</strong>系统写入都有容错——
+    程序文件本身永远先落盘。</li>
+    <li>内置的 Codex CLI 跟进到 <strong>0.166.0</strong>（每日流水线自动 bump）。</li>
+    <li>发布流水线先跑全部测试再构建，坏的提交发不出去。</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.1">
     <h2 class="plain"><a href="#v1.7.1">1.7.1</a></h2>
     <p>BaoCode Codex 1.7.1：写不进去的地方，也不再装不上</p>
