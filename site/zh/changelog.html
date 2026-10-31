@@ -30,6 +30,22 @@
   <h1>更新日志</h1>
   <p class="subtitle">BaoCode 每个版本的变化。</p>
 
+  <section class="release" id="v1.7.8">
+    <h2 class="plain"><a href="#v1.7.8">1.7.8</a></h2>
+    <p>BaoCode Codex 1.7.8：自定义上游的两个尾巴</p>
+    <p>1.7.6/1.7.7 的日志揭出又两个问题（正是那两行 Missing environment variable 与
+    Model metadata not found）：</p>
+    <p>修复</p>
+    <ul>
+    <li><strong>上游密钥从未送到进程</strong>：它被放进了启动参数里的环境变量表，却没有并进
+    子进程的环境——现在并入了，<code>Missing environment variable</code> 消失。</li>
+    <li><strong>回合用错模型名</strong>：发给服务器的模型名是应用里的引用（@provider/qoder-cn/dfmodel），
+    而服务器只认自己伺服的短名（dfmodel）。现在按上游伺服的名字询问，
+    <code>Model metadata not found</code> 消失。</li>
+    <li>测试：mock 记录每回合询问的模型名，断言是上游的短名。</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.7">
     <h2 class="plain"><a href="#v1.7.7">1.7.7</a></h2>
     <p>BaoCode Codex 1.7.7：自定义上游真正修好</p>
