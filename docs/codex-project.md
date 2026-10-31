@@ -215,3 +215,16 @@ git merge upstream/main --no-edit
 - `docs/claude-code-kernel.md`：另一个产品的内核读本（两个产品共用框架，对照着看）。
 - `docs/release.md` §4.1：一次发版、两个产品。
 - `F:\Projects\_baocode开发上下文.md`：整个工作区的开发上下文（含这个项目的来龙去脉）。
+
+## 质量状态（2026-10-31，v1.7.5）
+
+- 全量测试 6658 项全绿（45 跳过）；`flutter analyze` 干净（除上游测试的两个命名风格）。
+- 跨面定向巡查 23 轮，覆盖**全部**测试目录与四个包：kernel（含契约锚点）、
+  chat 主链路 445 项、settings 全量 180 项、ide/markdown/l10n/theme 3865 项、
+  models 67 项、browser、update 83 项、stash+channel 158 项、remote 69 项、
+  workspace 70 项、forge 13 项、images 12 项、其余 16 目录 521 项、
+  包（bao_agent 163、bao_markdown、bao_link 59、bao_remote）。
+- 更新链：全历史版本（1.6.0/1.7.0/1.7.2/1.7.3/1.7.4）→ 1.7.5 的升级提示逐一验证，
+  签名核对通过；每日流水线持续盯。
+- 协议契约：内核全部 method/字段/通知对照 CLI 0.166 自生成的 schema 核对，
+  并由 `test/kernel/codex_contract_test.dart` 守护。
