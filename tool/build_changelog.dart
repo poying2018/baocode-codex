@@ -1,6 +1,6 @@
 // Writes the site's changelog from the release notes: site/changelog.html
-// (English, baocode.dev/changelog) and site/zh/changelog.html (Chinese,
-// baocode.dev/zh/changelog). Every version with notes in
+// (English, github.com/poying2018/baocode-codex/releases) and site/zh/changelog.html (Chinese,
+// github.com/poying2018/baocode-codex/releases). Every version with notes in
 // release-notes/<x.y.z>.<en|zh>.md, newest first, each at #v<x.y.z>, which
 // the app's update notification links to (UpdateController.changelogUrl).
 // A version without notes in a language shows its English ones there, as
@@ -139,8 +139,8 @@ String _html(_Page page, List<(AppVersion, String?)> releases) {
 <link rel="icon" href="/icon.png">
 <link rel="stylesheet" href="/style.css">
 <script src="/head.js"></script>
-<link rel="alternate" hreflang="en" href="https://baocode.dev${_Page.en.url}">
-<link rel="alternate" hreflang="zh" href="https://baocode.dev${_Page.zh.url}">
+<link rel="alternate" hreflang="en" href="https://github.com/poying2018/baocode-codex/releases">
+<link rel="alternate" hreflang="zh" href="https://github.com/poying2018/baocode-codex/releases">
 </head>
 <body>
 <!-- Made by tool/build_changelog.dart from release-notes/: edit those, not this. -->
@@ -153,7 +153,7 @@ String _html(_Page page, List<(AppVersion, String?)> releases) {
   <a class="brand" href="${page.home}"><img src="/icon.png" alt="">BaoCode</a>
   <a href="${page.home}download">${page.download}</a>
   <a href="${page.url}" aria-current="page">${page.heading}</a>
-  <a href="https://github.com/baocode-dev/baocode"><svg class="ic" aria-hidden="true"><use href="#ic-github"/></svg>GitHub</a>
+  <a href="https://github.com/poying2018/baocode-codex"><svg class="ic" aria-hidden="true"><use href="#ic-github"/></svg>GitHub</a>
   <a class="lang" href="${page.other.url}" hreflang="${page.other.language}" lang="${page.other.htmlLang}">${page.other.name}</a>
 </header>
 

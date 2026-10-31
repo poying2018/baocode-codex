@@ -25,9 +25,8 @@ void main() {
       // leading elsewhere would be a download page that lies.
       for (final page in ['site/download.html', 'site/zh/download.html']) {
         final html = File(page).readAsStringSync();
-        // Android's card is off the site for now (site-worker/index.js,
-        // MOBILE_OFFLINE): the cards there are checked, iOS's at least.
-        expect(html, contains('data-os="ios"'), reason: page);
+        // This fork ships Windows only: no phone cards, and the QR codes'
+        // targets stay the upstream's own (tool/make_download_qr.dart).
         for (final MapEntry(key: os, value: target) in downloadQrTargets.entries) {
           if (!html.contains('data-os="$os"')) continue;
           final card = _cardOf(html, os);
@@ -42,6 +41,8 @@ void main() {
             reason: '$page, the $os card links elsewhere',
           );
         }
+        // The desktop cards' buttons lead here, not to the upstream's /dl/.
+        expect(html, isNot(contains('href="/dl/')), reason: page);
       }
     });
 
