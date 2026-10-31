@@ -1,0 +1,22 @@
+[
+  "account/chatgptAuthTokens/refresh",
+  "account/rateLimits/read",
+  "config/mcpServer/reload",
+  "config/value/write",
+  "fuzzyFileSearch",
+  "mcpServer/oauth/login",
+  "mcpServerStatus/list",
+  "model/list",
+  "review/start",
+  "thread/compact/start",
+  "thread/delete",
+  "thread/fork",
+  "thread/list",
+  "thread/name/set",
+  "thread/resume",
+  "thread/revert",
+  "thread/start",
+  "thread/turns/list",
+  "turn/interrupt",
+  "turn/start"
+]

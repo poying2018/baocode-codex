@@ -106,4 +106,85 @@ void main() {
     // ignore: avoid_print
     print('the kernel asked: ${transport.methods.toSet().toList()..sort()}');
   });
+
+  test('every method literal in the kernel is one 0.166 knows', () {
+    // The kernel's own literals, read from the source: what it says, not
+    // what a test drove it to say. Against the frozen list of what 0.166's
+    // ClientRequest accepts - the requests, that is; the notifications the
+    // kernel listens for are checked against the fixture of those.
+    final source = [
+      File('lib/kernel/codex/codex_kernel.dart').readAsStringSync(),
+      File('lib/kernel/codex/codex_catalog.dart').readAsStringSync(),
+    ].join();
+    final literals = RegExp(
+      "'((thread|turn|model|account|config|mcpServer|mcpServerStatus|review|fuzzyFileSearch)/[A-Za-z0-9/]+)'",
+    )
+        .allMatches(source)
+        .map((m) => m.group(1)!)
+        .toSet();
+
+    const clientRequests = [
+      'account/chatgptAuthTokens/refresh',
+      'account/rateLimits/read',
+      'config/mcpServer/reload',
+      'config/value/write',
+      'fuzzyFileSearch',
+      'mcpServer/oauth/login',
+      'mcpServerStatus/list',
+      'model/list',
+      'review/start',
+      'thread/compact/start',
+      'thread/delete',
+      'thread/fork',
+      'thread/list',
+      'thread/name/set',
+      'thread/resume',
+      'thread/revert',
+      'thread/start',
+      'thread/turns/list',
+      'turn/interrupt',
+      'turn/start',
+    ];
+    const notifications = [
+      'account/chatgptAuthTokens/refresh',
+      'account/rateLimits/updated',
+      'config/mcpServer/reload',
+      'mcpServer/elicitation/request',
+      'mcpServer/oauth/login',
+      'mcpServer/startupStatus/updated',
+      // The older names the kernel keeps accepting beside these: a server on
+      // 0.164's CLI still says them (0.166 renamed both).
+      'mcpServerStatus/updated',
+      'thread/closed',
+      'mcpServerStatus/list',
+      'model/list',
+      'review/start',
+      'thread/compact/start',
+      'thread/delete',
+      'thread/deleted',
+      'thread/fork',
+      'thread/goal/cleared',
+      'thread/goal/updated',
+      'thread/list',
+      'thread/name/set',
+      'thread/name/updated',
+      'thread/prediction/updated',
+      'thread/resume',
+      'thread/revert',
+      'thread/settings/updated',
+      'thread/start',
+      'thread/tokenUsage/updated',
+      'thread/turns/list',
+      'turn/completed',
+      'turn/interrupt',
+      'turn/plan/updated',
+      'turn/start',
+      'turn/started',
+    ];
+    final unknown = literals
+        .where((m) => !clientRequests.contains(m) && !notifications.contains(m))
+        .toList();
+    expect(unknown, isEmpty,
+        reason: 'methods 0.166 does not know: $unknown');
+  });
 }
