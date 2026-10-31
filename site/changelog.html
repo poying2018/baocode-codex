@@ -30,6 +30,22 @@
   <h1>Changelog</h1>
   <p class="subtitle">What changed in each version of BaoCode.</p>
 
+  <section class="release" id="v1.7.7">
+    <h2 class="plain"><a href="#v1.7.7">1.7.7</a></h2>
+    <p>BaoCode Codex 1.7.7: your own upstream, actually fixed</p>
+    <p>The stderr log of 1.7.6 exposed the truth: <code>error: unexpected argument '--model' found</code>. The server for one of your own upstreams never started
+    at all - the <code>--model</code> it was given is not an argument the app-server
+    accepts.</p>
+    <p>Fixed</p>
+    <ul>
+    <li>The model rides as <code>--config model=...</code>, which the server reads; a
+    server for your upstream now starts with your model for the first time.</li>
+    <li>Proven by the test that runs a real app-server through a whole turn.</li>
+    <li>Should anything still fail, codex-stderr.log and the error say what
+    Codex itself said.</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.6">
     <h2 class="plain"><a href="#v1.7.6">1.7.6</a></h2>
     <p>BaoCode Codex 1.7.6: a failed start says what really happened</p>

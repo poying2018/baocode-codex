@@ -30,6 +30,20 @@
   <h1>更新日志</h1>
   <p class="subtitle">BaoCode 每个版本的变化。</p>
 
+  <section class="release" id="v1.7.7">
+    <h2 class="plain"><a href="#v1.7.7">1.7.7</a></h2>
+    <p>BaoCode Codex 1.7.7：自定义上游真正修好</p>
+    <p>1.7.6 的 stderr 日志让真实原因现形：<code>error: unexpected argument '--model' found</code>——
+    自定义上游的进程从未真正启动过，因为给它的 <code>--model</code> 参数被 app-server 拒绝。</p>
+    <p>修复</p>
+    <ul>
+    <li>模型改用 <code>--config model=...</code> 传递（app-server 接受的写法），自定义上游的
+    服务器第一次真正带着你的模型启动。</li>
+    <li>通过真实 app-server 进程的完整对话测试验证。</li>
+    <li>若仍有问题，codex-stderr.log 与错误提示会显示它自己的原话。</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.6">
     <h2 class="plain"><a href="#v1.7.6">1.7.6</a></h2>
     <p>BaoCode Codex 1.7.6：启动失败说出真实原因</p>
