@@ -33,7 +33,6 @@ const replacements = [
 
 void main() {
   var files = 0;
-  var changes = 0;
   for (final entry in Directory('site').listSync(recursive: true)) {
     if (entry is! File || !entry.path.endsWith('.html')) continue;
     final text = entry.readAsStringSync();
@@ -44,10 +43,6 @@ void main() {
     if (next != text) {
       entry.writeAsStringSync(next);
       files++;
-      changes += [
-        for (final [from, _] in replacements)
-          if (text.contains(from)) from,
-      ].length;
     }
   }
   stdout.writeln('files: $files');
