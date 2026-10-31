@@ -30,6 +30,20 @@
   <h1>更新日志</h1>
   <p class="subtitle">BaoCode 每个版本的变化。</p>
 
+  <section class="release" id="v1.7.5">
+    <h2 class="plain"><a href="#v1.7.5">1.7.5</a></h2>
+    <p>BaoCode Codex 1.7.5：切换上游不再撞车</p>
+    <p>上一版引入的「选了自定义上游就换一个 Codex 进程」有个没料到的冲突：两个进程共用
+    同一个状态文件夹，会互相锁死——切换上游后发消息报「另一个 Codex 可能正在运行」。</p>
+    <p>修复</p>
+    <ul>
+    <li><strong>每个上游的状态文件夹独立</strong>（从主文件夹完整播种），切换上游不再撞锁；
+    切回默认模型也照常。</li>
+    <li>应用退出时等服务器退出的时间从 3 秒加到 15 秒：升级时不再可能撞上一个
+    还在写数据库的旧进程（这正是升级后第一次发消息报错的另一个来源）。</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.4">
     <h2 class="plain"><a href="#v1.7.4">1.7.4</a></h2>
     <p>BaoCode Codex 1.7.4：修好自定义上游的第一轮对话</p>

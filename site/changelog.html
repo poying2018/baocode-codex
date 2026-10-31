@@ -30,6 +30,24 @@
   <h1>Changelog</h1>
   <p class="subtitle">What changed in each version of BaoCode.</p>
 
+  <section class="release" id="v1.7.5">
+    <h2 class="plain"><a href="#v1.7.5">1.7.5</a></h2>
+    <p>BaoCode Codex 1.7.5: switching upstreams no longer collides</p>
+    <p>The previous release gave each of your own upstreams a Codex process of its
+    own - but both processes shared one state folder, and locked each other out:
+    picking one of your models and sending a message said &quot;another Codex may be
+    running&quot;.</p>
+    <p>Fixed</p>
+    <ul>
+    <li>Each upstream's server keeps its state in a folder of its own (seeded from
+    the main one); switching upstreams no longer collides, and switching back
+    to the default works as before.</li>
+    <li>At quit the app waits fifteen seconds for its servers to go, not three: an
+    upgrade can no longer race one that is still writing its databases out -
+    the other source of the error after an upgrade.</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.4">
     <h2 class="plain"><a href="#v1.7.4">1.7.4</a></h2>
     <p>BaoCode Codex 1.7.4: a first turn on your own upstream works</p>
