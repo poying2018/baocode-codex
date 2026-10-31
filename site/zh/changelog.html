@@ -30,6 +30,19 @@
   <h1>更新日志</h1>
   <p class="subtitle">BaoCode 每个版本的变化。</p>
 
+  <section class="release" id="v1.7.4">
+    <h2 class="plain"><a href="#v1.7.4">1.7.4</a></h2>
+    <p>BaoCode Codex 1.7.4：修好自定义上游的第一轮对话</p>
+    <p>上一版里，如果你在「模型配置」里配了自己的上游并选中它，第一条消息发出去应用就会
+    崩溃（LateInitializationError）。这是发布前没有测到的一步，这一版修好。</p>
+    <p>修复</p>
+    <ul>
+    <li><strong>选了自定义上游后对话不再崩溃</strong>：应用的内部状态被切换上游的流程错误地重复初始化，
+    现在可以正常替换；第一条消息直接发往你选的上游。</li>
+    <li>测试环境（交付前的自动化验证）也会保留被测的通道，不再被误替换。</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.3">
     <h2 class="plain"><a href="#v1.7.3">1.7.3</a></h2>
     <p>BaoCode Codex 1.7.3：浏览器扩展，一条链</p>
