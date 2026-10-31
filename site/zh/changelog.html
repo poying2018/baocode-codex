@@ -30,6 +30,20 @@
   <h1>更新日志</h1>
   <p class="subtitle">BaoCode 每个版本的变化。</p>
 
+  <section class="release" id="v1.7.6">
+    <h2 class="plain"><a href="#v1.7.6">1.7.6</a></h2>
+    <p>BaoCode Codex 1.7.6：启动失败说出真实原因</p>
+    <p>「Codex ended before it was ready / 另一个 Codex 可能正在运行」这句提示是<strong>猜测</strong>：
+    只要 Codex 在就绪前退出，都这么显示——真因被盖住了。</p>
+    <p>改进</p>
+    <ul>
+    <li>Codex 的报错原话现在保存在状态文件夹的 codex-stderr.log 里，出错提示直接
+    附上它的原话——真实原因一眼可见（是不是锁、是不是配置、是不是别的）。</li>
+    <li>只有当 Codex 自己说「锁/数据库被占」时，才提示「另一个 Codex 可能正在运行」。</li>
+    <li>启动失败后自动重试一次：多数临时性失败（维护、文件还在写）这时已经过去。</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.5">
     <h2 class="plain"><a href="#v1.7.5">1.7.5</a></h2>
     <p>BaoCode Codex 1.7.5：切换上游不再撞车</p>

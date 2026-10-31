@@ -30,6 +30,24 @@
   <h1>Changelog</h1>
   <p class="subtitle">What changed in each version of BaoCode.</p>
 
+  <section class="release" id="v1.7.6">
+    <h2 class="plain"><a href="#v1.7.6">1.7.6</a></h2>
+    <p>BaoCode Codex 1.7.6: a failed start says what really happened</p>
+    <p>&quot;Codex ended before it was ready / Another Codex may be running&quot; was a
+    guess: every early exit said it, whether or not a folder was held, and
+    the real cause stayed hidden.</p>
+    <p>Improved</p>
+    <ul>
+    <li>What Codex says on stderr is now kept beside its state
+    (codex-stderr.log) and carried in the error - the real reason is right
+    there (a lock, a config, or something else).</li>
+    <li>The folder-lock wording appears only when Codex's own words say a lock
+    or a database was held.</li>
+    <li>A start that ends is tried once more, after a quarter of a second: a
+    maintenance pass or a file still being written out is over by then.</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.5">
     <h2 class="plain"><a href="#v1.7.5">1.7.5</a></h2>
     <p>BaoCode Codex 1.7.5: switching upstreams no longer collides</p>
