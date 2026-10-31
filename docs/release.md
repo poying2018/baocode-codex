@@ -2,10 +2,16 @@
 
 BaoCode 的版本号怎么定、一个版本怎么发出去、发到哪里、已安装的应用怎么拿到它，以及第一次发布前要准备什么。应用这一侧怎么检查、下载、校验、安装，见 [auto-update.md](auto-update.md)。
 
-- 下载与更新：`https://dl.baocode.dev`（Cloudflare R2）
-- 官网：`https://baocode.dev`（Cloudflare Worker `baocode` 的静态资源，`site/`；Workers Builds 从 GitHub 部署）
+> **这个 fork 只发 Windows 版。** 下面的流程大多是上游的（`dl.baocode.dev`、Cloudflare R2、
+> macOS 公证、Linux 包）：**本仓库不发布到那里，也不构建那些**。本仓库的下载与更新
+> 都在自己的 GitHub Releases 上，见第 1 节末尾的对照表。
+
+- 下载与更新：`https://github.com/poying2018/baocode-codex/releases`
+  （`latest-codex.json` 挂在 `releases/latest/download/` 下，应用读它；`dl.baocode.dev`
+  是上游的域名，与两个 fork 都无关）
+- 官网：`https://baocode.dev` 是上游的；本 fork 没有自己的官网
 - 构建与发布：GitHub Actions，`.github/workflows/release.yml`
-- 工具：`tool/bump_version.dart`、`tool/build_macos.dart`、`tool/build_windows.dart`、`tool/build_remote_server.dart`、`tool/release_manifest.dart`
+- 工具：`tool/bump_version.dart`、`tool/build_windows.dart`、`tool/build_remote_server.dart`、`tool/release_manifest.dart`
 
 ## 目录
 
@@ -194,26 +200,28 @@ dart run tool/build_macos.dart --remote-release              # macOS 同理
 - **密钥只在 `release` 环境里**，只有 `v*` 标签能用（见 7.2）。PR 和手动运行拿不到。
 - Flutter 版本固定在工作流的 `FLUTTER_VERSION`，升级 Flutter 时一起改。
 
-### 4.1 两个产品，一次发版
+### 4.1 一个仓库一个产品
 
-这个仓库出**两个程序**：BaoCode Claude（Claude Code 内核）和 BaoCode Codex（Codex 内核）。
-它们是两份程序，不是一个程序的两个开关 ⇒ **一次发版，两边都有**：
+这个仓库只出**一个程序**：BaoCode Codex（Codex 内核）。一个 `v<版本>` 标签发的就是它，
+没有产品矩阵可选——矩阵写死 `product: [baocode-codex]`，`publish` 里也是
+`--product baocode-codex`、只签一份清单（`out/latest-codex.json`），**清单最后传**。
 
-| | BaoCode Claude | BaoCode Codex |
+**BaoCode Claude 在它自己的仓库**（`poying2018/baocode`）：那份代码树是从这里分出去的
+（或说这里是从它分出去的——两边同源），发布链、版本号序列、更新通道（`latest.json`）
+完全独立——一个仓库只发自己的产品，谁也不替谁发布，版本号也不互相消耗。两边共享的
+代码靠 cherry-pick 来同步。
+
+| | BaoCode Claude（`poying2018/baocode`） | BaoCode Codex（本仓库） |
 | --- | --- | --- |
 | 安装包 | `BaoCodeClaude-<版本>-setup.exe` | `BaoCodeCodex-<版本>-setup.exe` |
 | 更新清单 | `latest.json` | `latest-codex.json` |
 | 远端服务端 | `baocode-server-*` | `baocode-codex-server-*` |
 
-- `remote` 任务**按产品各建一次**（矩阵：`baocode`、`baocode-codex`），产物名带产品名。
-- `windows` 任务**按产品 × 版本各建一次**（矩阵），`tool/build_windows.dart --product <产品>`。
-- `publish` 任务**签两份清单**（`tool/release_manifest.dart --product <产品> --manifest out/<清单名>`），
-  **两份清单最后传**。
-- 两个产品的服务端清单名也不同（`servers.json` / `servers-codex.json`），
-  否则一个会盖掉另一个的。
 - **产品由可执行文件的名字决定**（`baocode-claude.exe` / `baocode-codex.exe`），
   一处说清两个产品的分别：`packages/bao_remote/lib/src/platform/product.dart`。
   原生侧读同一个名字（`windows/runner/app_identity.cpp`），两边不会各说各话。
+  源码树里两个产品都认识，但 CI 只构建、发布本仓库的那一个；本地开发时
+  `windows/CMakeLists.txt` 的默认产品就是它。
 
 ## 5. dl.baocode.dev 上有什么
 
