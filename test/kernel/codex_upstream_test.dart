@@ -23,8 +23,11 @@ void main() {
     final launch = launchOn(const CodexLaunch(cwd: r'F:\Projects'), upstream);
 
     expect(launch.model, 'deepseek-chat');
-    expect(launch.arguments, contains('--model'));
-    expect(launch.arguments, contains('deepseek-chat'));
+    // The model rides as a config key: the app-server rejects `--model`.
+    expect(
+      launch.arguments,
+      containsAllInOrder(['--config', 'model="deepseek-chat"']),
+    );
     // The endpoint, its key's variable and the wire protocol, each a
     // `--config` Codex reads over its own file.
     final configs = <String>[];

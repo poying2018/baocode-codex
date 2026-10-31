@@ -58,16 +58,19 @@ class CodexLaunch {
   /// (`model_providers.<id>`), and the model it serves.
   final Map<String, String> overrides;
 
-  /// The arguments `codex app-server` is started with.
+  /// The arguments `codex app-server` is started with. The model rides
+  /// as a `--config model=...` and not as `--model`: the app-server
+  /// rejects `--model` outright (`error: unexpected argument '--model'
+  /// found`), while `model` is a config key it reads.
   List<String> get arguments => [
     'app-server',
     '--stdio',
-    // One `-c` for each: the key, then its value as TOML.
+    // One `--config` for each: the key, then its value as TOML.
     for (final MapEntry(:key, :value) in overrides.entries) ...[
       '--config',
       '$key=$value',
     ],
-    if (model case final model?) ...['--model', model],
+    if (model case final model?) ...['--config', 'model="$model"'],
   ];
 }
 
