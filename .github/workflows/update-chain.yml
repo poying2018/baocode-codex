@@ -1,0 +1,46 @@
+# Watches the update chain: the manifest an installed app reads, the download
+# it names, and the signature the app checks it with. A release that broke it
+# - a private repository, an address moved, a manifest signed with another
+# key - is caught the next morning, not when someone asks why there is no
+# update.
+#
+#   Actions -> Update chain -> Run workflow
+#
+# It runs on its own every day, after the release's own check, which is the
+# check at publish time and this the keeping watch over what is published.
+name: Update chain
+
+on:
+  schedule:
+    # Once a day, after the Codex version workflow has had its turn.
+    - cron: '3 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: update-chain
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Check the update chain
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      # Flutter, not Dart alone: the package is a Flutter one, and `pub get`
+      # resolves its SDK.
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.5'
+          cache: true
+      - name: Read the manifest as an app would, and verify it
+        run: |
+          flutter pub get
+          # An app at the version in the repository: whatever the chain
+          # offers, it says, and a broken chain fails here.
+          dart run tool/check_update_chain.dart
