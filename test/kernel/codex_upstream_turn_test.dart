@@ -31,7 +31,10 @@ void main() {
       MockKernels.codex,
       mock,
       context: KernelContext(
-        settings: {KernelChoiceKind.model.name: '@deepseek/deepseek-chat'},
+        settings: {
+          KernelChoiceKind.model.name: '@deepseek/deepseek-chat',
+          KernelChoiceKind.mode.name: 'ask',
+        },
       ),
     );
     addTearDown(kernel.closeEvents);
@@ -43,5 +46,53 @@ void main() {
     // app's reference for the pick: the server has no metadata for the
     // reference, and refuses the turn over it.
     expect(mock.modelsAsked.last, 'deepseek-chat');
+  });
+
+  test('changing the model mid-conversation asks for the new one', () async {
+    final providers = ModelProviders.memory(
+      providers: const [
+        ModelProvider(
+          id: 'deepseek',
+          name: 'DeepSeek',
+          baseUrl: 'https://api.deepseek.com',
+          models: [
+            ProviderModel(id: 'deepseek-chat'),
+            ProviderModel(id: 'deepseek-reasoner'),
+          ],
+        ),
+      ],
+    );
+    CodexKernel.allowTransportSwap = false;
+    addTearDown(() => CodexKernel.allowTransportSwap = true);
+    final was = ModelProviders.current;
+    ModelProviders.current = providers;
+    addTearDown(() => ModelProviders.current = was);
+    final mock = MockCodexTransport();
+
+    final kernel = CodexKernel(
+      MockKernels.codex,
+      mock,
+      context: KernelContext(
+        settings: {
+          KernelChoiceKind.model.name: '@deepseek/deepseek-chat',
+          KernelChoiceKind.mode.name: 'ask',
+        },
+      ),
+    );
+    addTearDown(kernel.closeEvents);
+    kernel.send(const KernelTurn(id: 't1', text: 'hello'));
+    await Future<void>.delayed(const Duration(seconds: 1));
+    // The pick changes mid-conversation, as the picker does it: through
+    // the kernel's own model choice, which guards against a no-op.
+    kernel.model.select('@deepseek/deepseek-reasoner');
+    kernel.send(const KernelTurn(id: 't2', text: 'again'));
+    for (var waited = 0;
+        waited < 25000 && mock.modelsAsked.length < 2;
+        waited += 250) {
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+    }
+    expect(kernel.health.status, isNot(KernelHealthStatus.failed),
+        reason: 'the change must not break the kernel');
+    expect(mock.modelsAsked, ['deepseek-chat', 'deepseek-reasoner']);
   });
 }

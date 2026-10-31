@@ -56,6 +56,10 @@ class MockCodexTransport implements CodexTransport {
 
   /// The model each turn asked for, in order, as it was asked.
   final List<String?> modelsAsked = [];
+
+  /// Every method written to it, in order: a test reads this to see how
+  /// far a turn got.
+  final List<String> methodsSeen = [];
   int _serverRequests = 0;
   int _tokens = 18400;
 
@@ -77,6 +81,7 @@ class MockCodexTransport implements CodexTransport {
   void write(Map<String, Object?> message) {
     final id = message['id'];
     final method = message['method'] as String?;
+    if (method case final String seen?) methodsSeen.add(seen);
     if (method == null) {
       // The client's answer to one of our requests.
       final decision = (message['result'] as Map?)?['decision'] as String?;

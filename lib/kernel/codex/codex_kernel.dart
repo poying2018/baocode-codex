@@ -232,12 +232,15 @@ class CodexKernel
   /// On one of the user's own upstreams the name is the model as that
   /// upstream serves it (`dfmodel`), not the app's reference for the
   /// pick (`@provider/qoder-cn/dfmodel`) — the server knows its own by
-  /// the short name, and the reference is not a model to it.
+  /// the short name, and the reference is not a model to it. The name
+  /// comes from the pick of the moment, not from the server the last
+  /// turn ran on: a change of pick mid-conversation takes effect.
   String? get _modelSelected {
     final picked = _pickedModel ?? _modelOptions.firstOrNull?.id;
-    final upstream = _upstream;
-    if (upstream == null) return picked;
-    return parseModelRef(picked) == null ? picked : upstream.modelId;
+    final parsed = parseModelRef(picked);
+    if (parsed == null) return picked;
+    final model = _providers?.resolve(picked)?.$2;
+    return model?.id ?? _upstream?.modelId;
   }
 
   /// Picks [id] for this conversation. The turn asks for it by name; the
