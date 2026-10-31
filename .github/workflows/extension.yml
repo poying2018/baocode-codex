@@ -127,7 +127,7 @@ jobs:
           url="https://github.com/$GITHUB_REPOSITORY/releases/download/browser-extension/BaoCode-browser-$VERSION.zip"
           jq -n --arg version "$VERSION" --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             --arg id "$EXTENSION_ID" \
-            --arg store "https://github.com/$GITHUB_REPOSITORY/releases/download/browser-extension" \
+            --arg store "https://github.com/$GITHUB_REPOSITORY/releases/tag/extension" \
             --arg url "$url" --arg sha "$sha" --argjson size "$size" \
             '{version: $version, pubDate: $date, id: $id, store: $store,
               downloads: {"browser-extension": {url: $url, size: $size, sha256: $sha}}}' > latest.json
