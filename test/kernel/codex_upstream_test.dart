@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:baocode/kernel/codex/codex_transport.dart';
+import 'package:baocode/kernel/codex/codex_transport_factory.dart';
 import 'package:baocode/kernel/codex/codex_upstream.dart';
 import 'package:baocode/models/model_provider.dart';
 import 'package:baocode/models/model_providers.dart';
@@ -76,5 +77,20 @@ void main() {
       endpoint: (id) async => (baseUrl: '', token: ''),
     );
     expect(openai, isNull);
+  });
+
+  test('two upstreams keep homes apart, none inside the main one', () {
+    // 1.7.5's invariant: the two servers never share a state folder - the
+    // databases of one are locked while either runs.
+    const home = r'C:\Users\me\AppData\Roaming\baocode-codex\codex';
+    final alpha = upstreamHomeFor(home, 'alpha');
+    final beta = upstreamHomeFor(home, 'beta');
+    expect(alpha, isNot(beta));
+    expect(alpha, isNot(home));
+    expect(beta, isNot(home));
+    expect(alpha, contains('alpha'));
+    expect(beta, contains('beta'));
+    expect(upstreamHomeFor(home, null), home,
+        reason: 'the default model keeps the main folder');
   });
 }

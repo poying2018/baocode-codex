@@ -82,8 +82,7 @@ abstract final class CodexTransportFactory {
     // two servers sharing one CODEX_HOME refuse to start together (the
     // databases are locked while either runs), and the second one's error
     // is what the user saw as "another Codex is running".
-    final upstreamHome =
-        upstream == null ? home : p.join('$home-upstreams', upstream.id);
+    final upstreamHome = upstreamHomeFor(home, upstream?.id);
     _seed(upstreamHome);
     final key = upstream == null ? home : '$home#${upstream.id}';
     return _shared.putIfAbsent(
@@ -294,3 +293,9 @@ class _StartingCodexTransport implements CodexTransport {
     return transport;
   }
 }
+
+/// The folder a server for [upstreamId] keeps its state in, beside the
+/// app's own codex folder: `codex-upstreams/<id>`. One per upstream, since
+/// two servers sharing one folder refuse to start together.
+String upstreamHomeFor(String home, String? upstreamId) =>
+    upstreamId == null ? home : p.join('$home-upstreams', upstreamId);
