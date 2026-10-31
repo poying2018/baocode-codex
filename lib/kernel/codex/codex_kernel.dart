@@ -106,7 +106,9 @@ class CodexKernel
   /// the kernel was made with is replaced by one started for that upstream
   /// when the first turn asks for it (see [_restartOn]).
   CodexTransport _transport;
-  late final StreamSubscription<Map<String, Object?>> _subscription;
+  // Not final: a first turn on one of the user's own upstreams replaces the
+  // transport, and this is made again for the new one's messages.
+  late StreamSubscription<Map<String, Object?>> _subscription;
 
   /// Where it works: the project directory it is to run in.
   late final KernelContext _context;
@@ -261,8 +263,10 @@ class CodexKernel
     _upstream = wanted;
     _listed = null;
     _modelsLoaded = false;
+    // A transport the kernel was handed — the mock's, a test's — is not
+    // this kernel's to replace: only one the factory made can be remade.
+    if (!allowTransportSwap) return;
     final fresh = CodexTransportFactory.of(_context, upstream: wanted);
-    if (identical(fresh, _transport)) return;
     await _subscription.cancel();
     _transport = fresh;
     _subscription = _transport.messages.listen(
@@ -271,6 +275,15 @@ class CodexKernel
       onDone: _streamDone,
     );
   }
+
+  @visibleForTesting
+  String get debugTransportType => _transport.runtimeType.toString();
+
+  /// Whether [_prepareUpstream] may replace the transport. A test that
+  /// hands the kernel a scripted transport turns this off: what it scripted
+  /// is what the kernel must keep talking over.
+  @visibleForTesting
+  static bool allowTransportSwap = true;
 
   @override
   KernelHealth get health => _health;
