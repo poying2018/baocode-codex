@@ -30,6 +30,39 @@
   <h1>Changelog</h1>
   <p class="subtitle">What changed in each version of BaoCode.</p>
 
+  <section class="release" id="v1.7.3">
+    <h2 class="plain"><a href="#v1.7.3">1.7.3</a></h2>
+    <p>BaoCode Codex 1.7.3: the browser extension, one chain</p>
+    <p>This release puts the browser extension's &quot;get it&quot; chain together: the address
+    the app's button opens, the extension's manifest and its download all point at
+    this repository's own release now, and each of them has been fetched
+    anonymously to be sure it answers.</p>
+    <p>New</p>
+    <ul>
+    <li>A copy-installed app can be registered with Windows
+    (tool/register_install.ps1): the browsers' hosts, the baocode-codex://
+    scheme, the Explorer context menu, the Start Menu and the Control Panel's
+    uninstall entry - a machine whose profile refused the installer's writes
+    ends up just as installed after the script runs.</li>
+    </ul>
+    <p>Fixed</p>
+    <ul>
+    <li>The app's &quot;get the extension&quot; address works: it pointed at a service this
+    product does not run (a 404). The manifest, the download and the store's
+    page come from this repository's releases, each fetched anonymously and
+    verified.</li>
+    <li>The extension's own pipeline publishes to the same release: the manifest
+    after the zip it names, a tester's files carrying their tag, and no
+    dependency on another product's download site.</li>
+    </ul>
+    <p>For developers</p>
+    <ul>
+    <li>The browser bridge's end-to-end test runs on Windows: the host's path, the
+    socket folder and the browser's temporary-directory variables follow the
+    platform (BAO_BROWSER_HOST overrides the host's path).</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.2">
     <h2 class="plain"><a href="#v1.7.2">1.7.2</a></h2>
     <p>BaoCode Codex 1.7.2: the installation goes where it can</p>

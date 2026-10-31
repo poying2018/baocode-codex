@@ -30,6 +30,31 @@
   <h1>更新日志</h1>
   <p class="subtitle">BaoCode 每个版本的变化。</p>
 
+  <section class="release" id="v1.7.3">
+    <h2 class="plain"><a href="#v1.7.3">1.7.3</a></h2>
+    <p>BaoCode Codex 1.7.3：浏览器扩展，一条链</p>
+    <p>这一版把浏览器扩展的「获取」整条链打通：应用里的按钮打开的地址、扩展的清单、
+    扩展本体的下载，全部指向<strong>本仓库自己的 release</strong>，而且实际访问验证过每一个都通。</p>
+    <p>新功能</p>
+    <ul>
+    <li><strong>复制式安装也能注册进 Windows</strong>（<code>tool/register_install.ps1</code>）：浏览器宿主、
+    <code>baocode-codex://</code> 链接、资源管理器右键菜单、开始菜单、控制面板卸载项——
+    安装器写不进用户配置文件的机器，装完跑一遍脚本同样是完整安装。</li>
+    </ul>
+    <p>修复</p>
+    <ul>
+    <li><strong>应用里「获取扩展」打开的地址修好了</strong>：之前指向一个本产品没有的服务（404）。
+    现在清单、下载、商店页全部指向本仓库的 release，且逐个用匿名访问验证过。</li>
+    <li>扩展的发布流水线同样发到本仓库的 release：清单在它命名的 zip 之后上传，
+    测试版资产带标签名，不再依赖别家的下载站。</li>
+    </ul>
+    <p>开发者</p>
+    <ul>
+    <li>浏览桥的端到端测试能在 Windows 上跑了：宿主路径、socket 目录、浏览器的
+    临时目录变量都按平台来（<code>BAO_BROWSER_HOST</code> 可覆盖宿主路径）。</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.2">
     <h2 class="plain"><a href="#v1.7.2">1.7.2</a></h2>
     <p>BaoCode Codex 1.7.2：安装在哪里都能成</p>
