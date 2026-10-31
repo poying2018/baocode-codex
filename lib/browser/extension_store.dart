@@ -28,10 +28,10 @@ abstract final class ExtensionStore {
     '/detail/${BrowserBridge.extensionIds.first}',
   );
 
-  /// The zip to load unpacked: the release beside it sends it to the
-  /// newest.
+  /// The zip to load unpacked: a stable name on the extension's release,
+  /// which the workflow clobbers with the newest one.
   static final zip = AppLinks.releases.replace(
-    path: '${AppLinks.releases.path}/download/browser-extension',
+    path: '${AppLinks.releases.path}/download/extension/browser-extension.zip',
   );
 
   /// The store's page as last known: fetched, or kept; [fallback] before.
