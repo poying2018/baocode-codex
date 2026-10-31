@@ -8,8 +8,8 @@
 <link rel="icon" href="/icon.png">
 <link rel="stylesheet" href="/style.css">
 <script src="/head.js"></script>
-<link rel="alternate" hreflang="en" href="https://baocode.dev/upstreams">
-<link rel="alternate" hreflang="zh" href="https://baocode.dev/zh/upstreams">
+<link rel="alternate" hreflang="en" href="https://github.com/poying2018/baocode-codex/blob/main/site/upstreams.html">
+<link rel="alternate" hreflang="zh" href="https://github.com/poying2018/baocode-codex/blob/main/site/upstreams.html">
 </head>
 <body>
 <canvas class="grid" aria-hidden="true"></canvas>
@@ -21,7 +21,7 @@
   <a class="brand" href="/zh/"><img src="/icon.png" alt="">BaoCode</a>
   <a href="/zh/download">下载</a>
   <a href="/zh/changelog">更新日志</a>
-  <a href="https://github.com/baocode-dev/baocode"><svg class="ic" aria-hidden="true"><use href="#ic-github"/></svg>GitHub</a>
+  <a href="https://github.com/poying2018/baocode-codex"><svg class="ic" aria-hidden="true"><use href="#ic-github"/></svg>GitHub</a>
   <a class="lang" href="/upstreams" hreflang="en" lang="en">English</a>
 </header>
 
@@ -52,16 +52,16 @@
 
   <h2>交给 AI 来做，瞬间完成曝光</h2>
   <p>在您站点的代码仓库里，把下面这段发给 AI 编程助手（Claude Code、Codex、Cursor……）。它会判断站点用的是什么并完成接入，new-api 系的站点连代码都不用改。</p>
-  <div class="copyable" data-prompt><pre><code>请帮我在我的 API 站点上接入「导入到 BaoCode」一键导入。BaoCode 是一个桌面 AI 编程客户端，接入说明见 https://baocode.dev/zh/upstreams 。
+  <div class="copyable" data-prompt><pre><code>请帮我在我的 API 站点上接入「导入到 BaoCode」一键导入。BaoCode 是一个桌面 AI 编程客户端，接入说明见 https://github.com/poying2018/baocode-codex/blob/main/site/upstreams.html 。
 
 1. 先看清这个站点是什么：
    - new-api / one-api 系（有「系统设置 → 聊天设置」）：不用改代码。告诉我在聊天设置里加这一项：
-     { "BaoCode": "https://baocode.dev/import#v=1&amp;name=&lt;站点名&gt;&amp;protocol=anthropic&amp;url={address}&amp;key={key}" }
+     { "BaoCode": "https://github.com/poying2018/baocode-codex/import#v=1&amp;name=&lt;站点名&gt;&amp;protocol=anthropic&amp;url={address}&amp;key={key}" }
      并提醒我登录一个普通用户账号，用这个用户的令牌实际点一次导入，确认导入的 key 和站点上的完整 key 一模一样。
    - 其他（sub2api 或自研）：在用户登录后看到的令牌 / API Key 列表里，每个令牌旁边加一个「导入到 BaoCode」按钮，按第 2 条实现。导入的是站点用户自己的令牌，不是站长或管理员的。
 
 2. 按钮在新标签页打开（target="_blank" rel="noopener noreferrer"）：
-   https://baocode.dev/import#v=1&amp;name=&lt;站点名&gt;&amp;protocol=&lt;协议&gt;&amp;url=&lt;API Base URL&gt;&amp;key=&lt;完整 key&gt;
+   https://github.com/poying2018/baocode-codex/import#v=1&amp;name=&lt;站点名&gt;&amp;protocol=&lt;协议&gt;&amp;url=&lt;API Base URL&gt;&amp;key=&lt;完整 key&gt;
    - name：站点名，用站点配置里的名称。
    - protocol：anthropic（站点提供 /v1/messages）、openai-chat（/v1/chat/completions）或 openai-responses（/v1/responses）。支持 anthropic 就用 anthropic；不同令牌走不同协议的（比如按分组区分），按这个令牌的实际情况选。
    - url：用户调用 API 的 Base URL，和站点上展示给用户的一致，http 或 https；anthropic 协议不带 /v1。
@@ -70,22 +70,22 @@
    - 参数必须放在 # 后面，绝不能放在 ? 后面：浏览器不会把 # 后面的内容发给任何服务器，key 不经过 baocode.dev 或任何服务器。
 
 3. 按钮文字用「导入到 BaoCode」，样式和页面上现有的按钮保持一致。文字前放 BaoCode 标志：用 &lt;img&gt; 引用 baocode.dev 上的在线图片，不要把图片下载进项目，也不要自己画或内联 SVG。
-   - 地址：https://baocode.dev/brand/baocode-mark-&lt;颜色&gt;-&lt;高度&gt;.webp
+   - 地址：https://github.com/poying2018/baocode-codex/brand/baocode-mark-&lt;颜色&gt;-&lt;高度&gt;.webp
    - 颜色：black 用在浅色按钮上，white 用在深色或彩色（主色）按钮上；站点有深浅两种主题的，跟着主题切换。
    - 尺寸：标志宽高比 4:3。按按钮文字大小选显示尺寸，src 用 1x 那张，srcset 给高分屏加 2x、3x：
      · 文字 13–14px（小按钮、表格行里的按钮）：显示 16×12，高度 12 / 24 / 36
      · 文字 15–16px（普通按钮）：显示 24×18，高度 18 / 36 / 54
      · 文字 18px 以上（大按钮）：显示 32×24，高度 24 / 48 / 72
-     例：&lt;img src="https://baocode.dev/brand/baocode-mark-black-12.webp" srcset="https://baocode.dev/brand/baocode-mark-black-24.webp 2x, https://baocode.dev/brand/baocode-mark-black-36.webp 3x" width="16" height="12" alt=""&gt;
+     例：&lt;img src="https://github.com/poying2018/baocode-codex/brand/baocode-mark-black-12.webp" srcset="https://github.com/poying2018/baocode-codex/brand/baocode-mark-black-24.webp 2x, https://github.com/poying2018/baocode-codex/brand/baocode-mark-black-36.webp 3x" width="16" height="12" alt=""&gt;
    - 标志和文字间隔 6px 左右，垂直居中。写上 width 和 height，加载前不会跳动；alt 留空，按钮文字已经说明了。
-   - 地方够、想放方形应用图标时（比如导入说明、卡片里）：https://baocode.dev/brand/baocode-icon-&lt;尺寸&gt;.png，尺寸有 16、24、32、48、64、96、128、256、512。src 用显示尺寸那张，srcset 加 2 倍那张，例：&lt;img src="https://baocode.dev/brand/baocode-icon-32.png" srcset="https://baocode.dev/brand/baocode-icon-64.png 2x" width="32" height="32" alt=""&gt;
-   - 站点设了 CSP 的，把 https://baocode.dev 加进 img-src。
+   - 地方够、想放方形应用图标时（比如导入说明、卡片里）：https://github.com/poying2018/baocode-codex/brand/baocode-icon-&lt;尺寸&gt;.png，尺寸有 16、24、32、48、64、96、128、256、512。src 用显示尺寸那张，srcset 加 2 倍那张，例：&lt;img src="https://github.com/poying2018/baocode-codex/brand/baocode-icon-32.png" srcset="https://github.com/poying2018/baocode-codex/brand/baocode-icon-64.png 2x" width="32" height="32" alt=""&gt;
+   - 站点设了 CSP 的，把 https://github.com/poying2018/baocode-codex 加进 img-src。
    除了这些图片，不要引用 baocode.dev 的脚本或样式，后端也不要请求 baocode.dev。
 
 4. 做完后告诉我改了哪些文件，以及怎么验证：点按钮应打开 baocode.dev/import，页面上显示站点名、协议、地址和打码后的 key；装了 BaoCode 的话，会弹出导入确认。
 
 5. 验证通过后，帮我通知 BaoCode 收录我的站点，在 BaoCode 的 设置 → 模型 里展示（免费）。
-   在 BaoCode 的 GitHub 仓库开一个 issue 通知收录：https://github.com/baocode-dev/baocode/issues/new?template=upstream-listing.yml
+   在 BaoCode 的 GitHub 仓库开一个 issue 通知收录：https://github.com/poying2018/baocode-codex/issues/new?template=upstream-listing.yml
    - 装了 gh 并已登录的，用 gh issue create --repo baocode-dev/baocode --title "[Upstream] &lt;站点名&gt;" --body-file &lt;文件&gt; 直接提交；没有的话，把整理好的内容给我，我打开上面的链接自己贴。
    - 正文按下面的小标题顺序写（和 issue 表单一致），每项一段：
      ### Site name / 站点名称：卡片上显示的名称，不超过 24 个字符。
@@ -102,7 +102,7 @@
    - 命令行传不了图片：提交后提醒我把 Logo 和按钮位置的截图拖进 issue 的评论里。
    - 站点名、推广参数、联系方式这些拿不准的，先问我，不要编。</code></pre><button class="copy" type="button" data-copy data-done="已复制">复制</button></div>
   <p>也可以挑一个按钮样式：点一下想要的按钮，复制的提示词就会带上它的样子。</p>
-  <div class="styles" data-page="https://baocode.dev/zh/upstreams" data-href="第 2 条的导入链接" data-template="按钮样式（这条优先于第 3 条里“和页面上现有的按钮保持一致”）：照 {url} 上「{name}」这个按钮做，它的 HTML 是：
+  <div class="styles" data-page="https://github.com/poying2018/baocode-codex/blob/main/site/upstreams.html" data-href="第 2 条的导入链接" data-template="按钮样式（这条优先于第 3 条里“和页面上现有的按钮保持一致”）：照 {url} 上「{name}」这个按钮做，它的 HTML 是：
 {html}
 照它的颜色、边框、圆角、内边距、字号和图标尺寸做，写成站点自己的写法（组件、CSS 类都行，不必用内联样式）；href 换成第 2 条的导入链接，图片仍然引用 baocode.dev 上的地址。站点有深色主题的，深色下换成相配的颜色，图标随底色换 black / white。悬停时稍微加深或变亮，和站点其他按钮的悬停效果一致。{note}">
     <button type="button" class="pick" id="style-outline" data-style="描边" data-note="" data-hint="描边 · 使用这个样式" data-done="已复制提示词" aria-label="描边：使用这个样式"><span class="sample" style="display:inline-flex;align-items:center;gap:6px;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;font-weight:500;line-height:1;text-decoration:none;white-space:nowrap;cursor:pointer;height:32px;padding:0 12px;font-size:14px;border-radius:6px;border:1px solid #D9D9D9;background:#FFFFFF;color:#1B1A17;"><img src="/brand/baocode-mark-black-12.webp" srcset="/brand/baocode-mark-black-24.webp 2x, /brand/baocode-mark-black-36.webp 3x" width="16" height="12" alt="">导入到 BaoCode</span></button>
@@ -115,9 +115,9 @@
 
   <h2>通知 BaoCode 收录，确认后立刻上线</h2>
   <p>接好之后，通知 BaoCode 一声：我们确认导入可用后，您的卡片立刻出现在所有用户的 BaoCode 里，不用等 BaoCode 发新版本。这一步同样交给 AI：把下面这段发给它，它会按表单整理好材料，在 BaoCode 的 GitHub 上开一个 issue 通知我们，拿不准的会先问您。上一节的提示词已经包含这一步；自己手动接入的，用这一段就行。</p>
-  <div class="copyable"><pre><code>我的 API 站点已经接入了 BaoCode 一键导入，请帮我通知 BaoCode 收录，在 BaoCode 的 设置 → 模型 里展示（免费）。说明见 https://baocode.dev/zh/upstreams 。
+  <div class="copyable"><pre><code>我的 API 站点已经接入了 BaoCode 一键导入，请帮我通知 BaoCode 收录，在 BaoCode 的 设置 → 模型 里展示（免费）。说明见 https://github.com/poying2018/baocode-codex/blob/main/site/upstreams.html 。
 
-在 BaoCode 的 GitHub 仓库开一个 issue 通知收录：https://github.com/baocode-dev/baocode/issues/new?template=upstream-listing.yml
+在 BaoCode 的 GitHub 仓库开一个 issue 通知收录：https://github.com/poying2018/baocode-codex/issues/new?template=upstream-listing.yml
 - 装了 gh 并已登录的，用 gh issue create --repo baocode-dev/baocode --title "[Upstream] &lt;站点名&gt;" --body-file &lt;文件&gt; 直接提交；没有的话，把整理好的内容给我，我打开上面的链接自己贴。
 - 正文按下面的小标题顺序写（和 issue 表单一致），每项一段：
   ### Site name / 站点名称：卡片上显示的名称，不超过 24 个字符。
@@ -145,12 +145,12 @@
 
   <h2>自己动手：new-api 加一行配置</h2>
   <p>在 系统设置 → 聊天设置 中加入下面这一项。new-api 会替换 <code>{address}</code> 和 <code>{key}</code>，令牌列表里的每个令牌都会多出 BaoCode 选项：</p>
-  <pre><code>{ "BaoCode": "https://baocode.dev/import#v=1&amp;name=您的站点&amp;protocol=anthropic&amp;url={address}&amp;key={key}" }</code></pre>
+  <pre><code>{ "BaoCode": "https://github.com/poying2018/baocode-codex/import#v=1&amp;name=您的站点&amp;protocol=anthropic&amp;url={address}&amp;key={key}" }</code></pre>
   <p>如果用户应该走 OpenAI 接口，把协议换成 <code>protocol=openai-chat</code> 或 <code>openai-responses</code>。请登录一个普通用户账号，用它的令牌实际点一次导入，确认导入的 key 和站点上的完整 key 一模一样。</p>
 
   <h2>自己动手：其他站点放一个链接</h2>
   <p>在每个令牌旁放一个链接，在新标签页打开：</p>
-  <pre><code>https://baocode.dev/import#v=1&amp;name=…&amp;protocol=…&amp;url=…&amp;key=…</code></pre>
+  <pre><code>https://github.com/poying2018/baocode-codex/import#v=1&amp;name=…&amp;protocol=…&amp;url=…&amp;key=…</code></pre>
   <div class="table"><table>
     <thead><tr><th>参数</th><th></th><th>含义</th></tr></thead>
     <tbody>
@@ -171,7 +171,7 @@
     <div class="asset"><div class="swatch dark"><img src="/brand/baocode-mark-white-36.webp" srcset="/brand/baocode-mark-white-72.webp 2x" width="48" height="36" alt=""></div><p>白色标志，用在深色或彩色按钮上</p></div>
     <div class="asset"><div class="swatch"><img src="/brand/baocode-icon-48.png" srcset="/brand/baocode-icon-96.png 2x" width="48" height="48" alt=""></div><p>应用图标</p></div>
   </div>
-  <p>标志的地址是 <code>https://baocode.dev/brand/baocode-mark-&lt;black|white&gt;-&lt;高度&gt;.webp</code>，宽高比 4:3，按按钮文字大小选：</p>
+  <p>标志的地址是 <code>https://github.com/poying2018/baocode-codex/brand/baocode-mark-&lt;black|white&gt;-&lt;高度&gt;.webp</code>，宽高比 4:3，按按钮文字大小选：</p>
   <div class="table"><table>
     <thead><tr><th>按钮文字</th><th>显示尺寸</th><th>1x</th><th>2x</th><th>3x</th></tr></thead>
     <tbody>
@@ -180,8 +180,8 @@
       <tr><td>18px 以上，大按钮</td><td>32×24</td><td><a href="/brand/baocode-mark-black-24.webp">-24</a></td><td><a href="/brand/baocode-mark-black-48.webp">-48</a></td><td><a href="/brand/baocode-mark-black-72.webp">-72</a></td></tr>
     </tbody>
   </table></div>
-  <pre><code>&lt;img src="https://baocode.dev/brand/baocode-mark-black-12.webp" srcset="https://baocode.dev/brand/baocode-mark-black-24.webp 2x, https://baocode.dev/brand/baocode-mark-black-36.webp 3x" width="16" height="12" alt=""&gt;</code></pre>
-  <p>应用图标的地址是 <code>https://baocode.dev/brand/baocode-icon-&lt;尺寸&gt;.png</code>，尺寸有 <a href="/brand/baocode-icon-16.png">16</a> · <a href="/brand/baocode-icon-24.png">24</a> · <a href="/brand/baocode-icon-32.png">32</a> · <a href="/brand/baocode-icon-48.png">48</a> · <a href="/brand/baocode-icon-64.png">64</a> · <a href="/brand/baocode-icon-96.png">96</a> · <a href="/brand/baocode-icon-128.png">128</a> · <a href="/brand/baocode-icon-256.png">256</a> · <a href="/brand/baocode-icon-512.png">512</a>。src 用显示尺寸那张，srcset 加 2 倍那张。</p>
+  <pre><code>&lt;img src="https://github.com/poying2018/baocode-codex/brand/baocode-mark-black-12.webp" srcset="https://github.com/poying2018/baocode-codex/brand/baocode-mark-black-24.webp 2x, https://github.com/poying2018/baocode-codex/brand/baocode-mark-black-36.webp 3x" width="16" height="12" alt=""&gt;</code></pre>
+  <p>应用图标的地址是 <code>https://github.com/poying2018/baocode-codex/brand/baocode-icon-&lt;尺寸&gt;.png</code>，尺寸有 <a href="/brand/baocode-icon-16.png">16</a> · <a href="/brand/baocode-icon-24.png">24</a> · <a href="/brand/baocode-icon-32.png">32</a> · <a href="/brand/baocode-icon-48.png">48</a> · <a href="/brand/baocode-icon-64.png">64</a> · <a href="/brand/baocode-icon-96.png">96</a> · <a href="/brand/baocode-icon-128.png">128</a> · <a href="/brand/baocode-icon-256.png">256</a> · <a href="/brand/baocode-icon-512.png">512</a>。src 用显示尺寸那张，srcset 加 2 倍那张。</p>
 </main>
 
 <script src="/site.js"></script>

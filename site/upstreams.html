@@ -8,8 +8,8 @@
 <link rel="icon" href="icon.png">
 <link rel="stylesheet" href="style.css">
 <script src="/head.js"></script>
-<link rel="alternate" hreflang="en" href="https://baocode.dev/upstreams">
-<link rel="alternate" hreflang="zh" href="https://baocode.dev/zh/upstreams">
+<link rel="alternate" hreflang="en" href="https://github.com/poying2018/baocode-codex/blob/main/site/upstreams.html">
+<link rel="alternate" hreflang="zh" href="https://github.com/poying2018/baocode-codex/blob/main/site/upstreams.html">
 </head>
 <body>
 <canvas class="grid" aria-hidden="true"></canvas>
@@ -21,7 +21,7 @@
   <a class="brand" href="/"><img src="icon.png" alt="">BaoCode</a>
   <a href="/download">Download</a>
   <a href="/changelog">Changelog</a>
-  <a href="https://github.com/baocode-dev/baocode"><svg class="ic" aria-hidden="true"><use href="#ic-github"/></svg>GitHub</a>
+  <a href="https://github.com/poying2018/baocode-codex"><svg class="ic" aria-hidden="true"><use href="#ic-github"/></svg>GitHub</a>
   <a class="lang" href="/zh/upstreams" hreflang="zh" lang="zh-CN">中文</a>
 </header>
 
@@ -52,16 +52,16 @@
 
   <h2>Have your AI do it, and be listed in no time</h2>
   <p>Send this to your AI coding assistant (Claude Code, Codex, Cursor…) in your site’s repository. It works out what your site runs and adds the import; on new-api it is a line of settings, no code.</p>
-  <div class="copyable" data-prompt><pre><code>Add one-click "Import to BaoCode" to my API site. BaoCode is a desktop AI coding app; how the import works: https://baocode.dev/upstreams
+  <div class="copyable" data-prompt><pre><code>Add one-click "Import to BaoCode" to my API site. BaoCode is a desktop AI coding app; how the import works: https://github.com/poying2018/baocode-codex/blob/main/site/upstreams.html
 
 1. First find out what this site is:
    - new-api / one-api (it has System Settings → Chat Settings): no code needed. Tell me to add this entry in Chat Settings:
-     { "BaoCode": "https://baocode.dev/import#v=1&amp;name=&lt;site name&gt;&amp;protocol=anthropic&amp;url={address}&amp;key={key}" }
+     { "BaoCode": "https://github.com/poying2018/baocode-codex/import#v=1&amp;name=&lt;site name&gt;&amp;protocol=anthropic&amp;url={address}&amp;key={key}" }
      and to try it once, signed in as an ordinary user, with that user's key, and to check the key imported is exactly the whole key the site shows.
    - Anything else (sub2api, or our own code): add an "Import to BaoCode" button next to each key in the key / token list a signed-in user sees, as in step 2. What is imported is the site's user's own key, never the owner's or an admin's.
 
 2. The button opens, in a new tab (target="_blank" rel="noopener noreferrer"):
-   https://baocode.dev/import#v=1&amp;name=&lt;site name&gt;&amp;protocol=&lt;protocol&gt;&amp;url=&lt;API base URL&gt;&amp;key=&lt;the whole key&gt;
+   https://github.com/poying2018/baocode-codex/import#v=1&amp;name=&lt;site name&gt;&amp;protocol=&lt;protocol&gt;&amp;url=&lt;API base URL&gt;&amp;key=&lt;the whole key&gt;
    - name: the site's name, as the site's settings have it.
    - protocol: anthropic (the site serves /v1/messages), openai-chat (/v1/chat/completions) or openai-responses (/v1/responses). Use anthropic where the site supports it; where keys differ (by group, say), pick by this key's.
    - url: the base URL users call the API at, as the site shows it to them, http or https; without /v1 for anthropic.
@@ -70,22 +70,22 @@
    - The parameters go after the #, never after a ?: browsers never send what follows a # to any server, so the key goes through neither baocode.dev nor any other server.
 
 3. Label the button "Import to BaoCode" and style it as the page's other buttons. Put BaoCode's mark before the label: an &lt;img&gt; of the image online at baocode.dev, never a copy downloaded into the project, nor an SVG drawn or inlined.
-   - Address: https://baocode.dev/brand/baocode-mark-&lt;color&gt;-&lt;height&gt;.webp
+   - Address: https://github.com/poying2018/baocode-codex/brand/baocode-mark-&lt;color&gt;-&lt;height&gt;.webp
    - Color: black on light buttons, white on dark or colored (primary) buttons; where the site has light and dark themes, switch with them.
    - Size: the mark is 4:3. Pick its size by the label's, src the 1x image, and srcset the 2x and 3x for sharp screens:
      · Label 13–14px (small buttons, buttons in a table row): shown 16×12, heights 12 / 24 / 36
      · Label 15–16px (ordinary buttons): shown 24×18, heights 18 / 36 / 54
      · Label 18px or more (large buttons): shown 32×24, heights 24 / 48 / 72
-     For example: &lt;img src="https://baocode.dev/brand/baocode-mark-black-12.webp" srcset="https://baocode.dev/brand/baocode-mark-black-24.webp 2x, https://baocode.dev/brand/baocode-mark-black-36.webp 3x" width="16" height="12" alt=""&gt;
+     For example: &lt;img src="https://github.com/poying2018/baocode-codex/brand/baocode-mark-black-12.webp" srcset="https://github.com/poying2018/baocode-codex/brand/baocode-mark-black-24.webp 2x, https://github.com/poying2018/baocode-codex/brand/baocode-mark-black-36.webp 3x" width="16" height="12" alt=""&gt;
    - About 6px between the mark and the label, centered vertically. Give width and height, so nothing moves as it loads; leave alt empty, the label says it.
-   - Where a square app icon fits (on an import guide, a card): https://baocode.dev/brand/baocode-icon-&lt;size&gt;.png, sizes 16, 24, 32, 48, 64, 96, 128, 256, 512. src the size shown, srcset the one twice that, for example: &lt;img src="https://baocode.dev/brand/baocode-icon-32.png" srcset="https://baocode.dev/brand/baocode-icon-64.png 2x" width="32" height="32" alt=""&gt;
-   - Where the site sets a CSP, add https://baocode.dev to its img-src.
+   - Where a square app icon fits (on an import guide, a card): https://github.com/poying2018/baocode-codex/brand/baocode-icon-&lt;size&gt;.png, sizes 16, 24, 32, 48, 64, 96, 128, 256, 512. src the size shown, srcset the one twice that, for example: &lt;img src="https://github.com/poying2018/baocode-codex/brand/baocode-icon-32.png" srcset="https://github.com/poying2018/baocode-codex/brand/baocode-icon-64.png 2x" width="32" height="32" alt=""&gt;
+   - Where the site sets a CSP, add https://github.com/poying2018/baocode-codex to its img-src.
    Besides these images, don't load any script or style from baocode.dev, and don't call baocode.dev from the backend.
 
 4. When done, tell me which files changed and how to check it: the button should open baocode.dev/import, showing the site's name, the protocol, the URL and the key masked; with BaoCode installed, it then asks to import.
 
 5. Once it checks out, let BaoCode know, so it lists my site in its Settings → Models (free).
-   Let BaoCode know with an issue in its GitHub repository: https://github.com/baocode-dev/baocode/issues/new?template=upstream-listing.yml
+   Let BaoCode know with an issue in its GitHub repository: https://github.com/poying2018/baocode-codex/issues/new?template=upstream-listing.yml
    - With gh installed and signed in, submit it with gh issue create --repo baocode-dev/baocode --title "[Upstream] &lt;site name&gt;" --body-file &lt;file&gt;; otherwise give me the text, and I paste it in at the link above.
    - Write the body under these headings, in this order (as the issue form has them), a paragraph each:
      ### Site name / 站点名称: as the card shows it, at most 24 characters.
@@ -102,7 +102,7 @@
    - The command line can't attach images: once it is submitted, remind me to drag the logo and a screenshot of the button into a comment on the issue.
    - Ask me for what you aren't sure of (the site's name, promotion parameters, contact); don't make it up.</code></pre><button class="copy" type="button" data-copy data-done="Copied">Copy</button></div>
   <p>Or pick a button’s style: click the one you like, and the prompt copied has that button in it.</p>
-  <div class="styles" data-page="https://baocode.dev/upstreams" data-href="the import link of step 2" data-template="The button&#x27;s style (this before step 3&#x27;s &quot;as the page&#x27;s other buttons&quot;): make it as the &quot;{name}&quot; button at {url}, whose HTML is:
+  <div class="styles" data-page="https://github.com/poying2018/baocode-codex/blob/main/site/upstreams.html" data-href="the import link of step 2" data-template="The button&#x27;s style (this before step 3&#x27;s &quot;as the page&#x27;s other buttons&quot;): make it as the &quot;{name}&quot; button at {url}, whose HTML is:
 {html}
 Keep its colors, border, corners, padding, font size and icon size, written as the site writes its own (a component, CSS classes: no need for inline styles); the import link of step 2 for its href, the images still loaded from baocode.dev. Where the site has a dark theme, colors to match there, the mark black or white by the ground. On hover, a shade darker or lighter, as the site's other buttons do. {note}">
     <button type="button" class="pick" id="style-outline" data-style="Outline" data-note="" data-hint="Outline · Use this style" data-done="Prompt copied" aria-label="Outline: Use this style"><span class="sample" style="display:inline-flex;align-items:center;gap:6px;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;font-weight:500;line-height:1;text-decoration:none;white-space:nowrap;cursor:pointer;height:32px;padding:0 12px;font-size:14px;border-radius:6px;border:1px solid #D9D9D9;background:#FFFFFF;color:#1B1A17;"><img src="/brand/baocode-mark-black-12.webp" srcset="/brand/baocode-mark-black-24.webp 2x, /brand/baocode-mark-black-36.webp 3x" width="16" height="12" alt="">Import to BaoCode</span></button>
@@ -115,9 +115,9 @@ Keep its colors, border, corners, padding, font size and icon size, written as t
 
   <h2>Let BaoCode know, live once confirmed</h2>
   <p>Once it works, let BaoCode know: as soon as we’ve seen the import work, your card shows in every user’s BaoCode, with no new release to wait for. Have your AI do this too: send it the prompt below, and it gathers what the form asks and opens an issue on BaoCode’s GitHub to let us know, asking you what it isn’t sure of. The prompt above ends with this step; if you added the import by hand, this one is all you need.</p>
-  <div class="copyable"><pre><code>My API site has BaoCode's one-click import; let BaoCode know, so it lists the site in its Settings → Models (free). How it works: https://baocode.dev/upstreams
+  <div class="copyable"><pre><code>My API site has BaoCode's one-click import; let BaoCode know, so it lists the site in its Settings → Models (free). How it works: https://github.com/poying2018/baocode-codex/blob/main/site/upstreams.html
 
-Let BaoCode know with an issue in its GitHub repository: https://github.com/baocode-dev/baocode/issues/new?template=upstream-listing.yml
+Let BaoCode know with an issue in its GitHub repository: https://github.com/poying2018/baocode-codex/issues/new?template=upstream-listing.yml
 - With gh installed and signed in, submit it with gh issue create --repo baocode-dev/baocode --title "[Upstream] &lt;site name&gt;" --body-file &lt;file&gt;; otherwise give me the text, and I paste it in at the link above.
 - Write the body under these headings, in this order (as the issue form has them), a paragraph each:
   ### Site name / 站点名称: as the card shows it, at most 24 characters.
@@ -145,12 +145,12 @@ Let BaoCode know with an issue in its GitHub repository: https://github.com/baoc
 
   <h2>By hand: new-api, one line of settings</h2>
   <p>In System Settings → Chat Settings, add this entry. new-api fills in <code>{address}</code> and <code>{key}</code>, and every key in the token list gets a BaoCode option:</p>
-  <pre><code>{ "BaoCode": "https://baocode.dev/import#v=1&amp;name=YourSite&amp;protocol=anthropic&amp;url={address}&amp;key={key}" }</code></pre>
+  <pre><code>{ "BaoCode": "https://github.com/poying2018/baocode-codex/import#v=1&amp;name=YourSite&amp;protocol=anthropic&amp;url={address}&amp;key={key}" }</code></pre>
   <p>Use <code>protocol=openai-chat</code> or <code>openai-responses</code> instead if that is what your users should speak to. Try it once, signed in as an ordinary user, with that user's key, and check the key imported is exactly the whole key the site shows.</p>
 
   <h2>By hand: any other site, a link</h2>
   <p>Next to each key, a link that opens, in a new tab:</p>
-  <pre><code>https://baocode.dev/import#v=1&amp;name=…&amp;protocol=…&amp;url=…&amp;key=…</code></pre>
+  <pre><code>https://github.com/poying2018/baocode-codex/import#v=1&amp;name=…&amp;protocol=…&amp;url=…&amp;key=…</code></pre>
   <div class="table"><table>
     <thead><tr><th>Parameter</th><th></th><th>What it is</th></tr></thead>
     <tbody>
@@ -171,7 +171,7 @@ Let BaoCode know with an issue in its GitHub repository: https://github.com/baoc
     <div class="asset"><div class="swatch dark"><img src="/brand/baocode-mark-white-36.webp" srcset="/brand/baocode-mark-white-72.webp 2x" width="48" height="36" alt=""></div><p>White mark, for dark or colored buttons</p></div>
     <div class="asset"><div class="swatch"><img src="/brand/baocode-icon-48.png" srcset="/brand/baocode-icon-96.png 2x" width="48" height="48" alt=""></div><p>App icon</p></div>
   </div>
-  <p>The mark is at <code>https://baocode.dev/brand/baocode-mark-&lt;black|white&gt;-&lt;height&gt;.webp</code>, 4:3, sized by the button’s label:</p>
+  <p>The mark is at <code>https://github.com/poying2018/baocode-codex/brand/baocode-mark-&lt;black|white&gt;-&lt;height&gt;.webp</code>, 4:3, sized by the button’s label:</p>
   <div class="table"><table>
     <thead><tr><th>Label</th><th>Shown</th><th>1x</th><th>2x</th><th>3x</th></tr></thead>
     <tbody>
@@ -180,8 +180,8 @@ Let BaoCode know with an issue in its GitHub repository: https://github.com/baoc
       <tr><td>18px or more, large buttons</td><td>32×24</td><td><a href="/brand/baocode-mark-black-24.webp">-24</a></td><td><a href="/brand/baocode-mark-black-48.webp">-48</a></td><td><a href="/brand/baocode-mark-black-72.webp">-72</a></td></tr>
     </tbody>
   </table></div>
-  <pre><code>&lt;img src="https://baocode.dev/brand/baocode-mark-black-12.webp" srcset="https://baocode.dev/brand/baocode-mark-black-24.webp 2x, https://baocode.dev/brand/baocode-mark-black-36.webp 3x" width="16" height="12" alt=""&gt;</code></pre>
-  <p>The app icon is at <code>https://baocode.dev/brand/baocode-icon-&lt;size&gt;.png</code>, in <a href="/brand/baocode-icon-16.png">16</a> · <a href="/brand/baocode-icon-24.png">24</a> · <a href="/brand/baocode-icon-32.png">32</a> · <a href="/brand/baocode-icon-48.png">48</a> · <a href="/brand/baocode-icon-64.png">64</a> · <a href="/brand/baocode-icon-96.png">96</a> · <a href="/brand/baocode-icon-128.png">128</a> · <a href="/brand/baocode-icon-256.png">256</a> · <a href="/brand/baocode-icon-512.png">512</a>. src the size shown, and srcset the one twice that.</p>
+  <pre><code>&lt;img src="https://github.com/poying2018/baocode-codex/brand/baocode-mark-black-12.webp" srcset="https://github.com/poying2018/baocode-codex/brand/baocode-mark-black-24.webp 2x, https://github.com/poying2018/baocode-codex/brand/baocode-mark-black-36.webp 3x" width="16" height="12" alt=""&gt;</code></pre>
+  <p>The app icon is at <code>https://github.com/poying2018/baocode-codex/brand/baocode-icon-&lt;size&gt;.png</code>, in <a href="/brand/baocode-icon-16.png">16</a> · <a href="/brand/baocode-icon-24.png">24</a> · <a href="/brand/baocode-icon-32.png">32</a> · <a href="/brand/baocode-icon-48.png">48</a> · <a href="/brand/baocode-icon-64.png">64</a> · <a href="/brand/baocode-icon-96.png">96</a> · <a href="/brand/baocode-icon-128.png">128</a> · <a href="/brand/baocode-icon-256.png">256</a> · <a href="/brand/baocode-icon-512.png">512</a>. src the size shown, and srcset the one twice that.</p>
 </main>
 
 <script src="site.js"></script>
