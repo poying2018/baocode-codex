@@ -8,7 +8,7 @@
 #                                      <VERSION>/, latest.json there naming
 #                                      them: for apps packaged locally with
 #                                      --remote-release (tool/build_*.dart)
-#   Actions 鈫?Remote server 鈫?Run workflow
+#   Actions → Remote server → Run workflow
 #                                      build only, to try the build
 #
 # Release (release.yml) calls it too, for the builds both apps name; it
