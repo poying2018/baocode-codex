@@ -53,12 +53,10 @@ class CodexUpstream {
       ),
       '$prefix.base_url': _tomlString(baseUrl),
       '$prefix.env_key': _tomlString(keyVariable),
-      // The proxy answers the wire the provider speaks: an OpenAI-compatible
-      // one is spoken to with Chat Completions (the proxy passes those
-      // through), the rest with Responses.
-      '$prefix.wire_api': _tomlString(
-        provider.protocol == ProviderProtocol.openaiChat ? 'chat' : 'responses',
-      ),
+      // Responses, the one wire this Codex accepts (chat was dropped in
+      // 0.166 outright): the proxy answers it for the upstream, speaking
+      // the upstream's own wire to the upstream.
+      '$prefix.wire_api': _tomlString('responses'),
       // The provider serves its own models; Codex asks for them by name.
       'model_provider': _tomlString(id),
     };
