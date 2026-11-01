@@ -916,7 +916,14 @@ class CodexKernel
     _threadId = thread['id'] as String;
     final reportedModel = result['model'] ?? thread['model'];
     if (reportedModel is String && reportedModel.isNotEmpty) {
-      _pickedModel = reportedModel;
+      // A resumed thread carries the model of whatever ran it before - a
+      // model of another product, one this server retired, or one of the
+      // user's own. It is adopted only when the server lists it (so the
+      // picker has it and the turns name it right); otherwise what the
+      // user picked stands.
+      if (_pickedModel == null || _models.containsKey(reportedModel)) {
+        _pickedModel = reportedModel;
+      }
     }
     final provider = result['modelProvider'] ?? thread['modelProvider'];
     if (provider is String && provider.isNotEmpty) {
