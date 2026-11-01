@@ -30,6 +30,19 @@
   <h1>更新日志</h1>
   <p class="subtitle">BaoCode 每个版本的变化。</p>
 
+  <section class="release" id="v1.7.11">
+    <h2 class="plain"><a href="#v1.7.11">1.7.11</a></h2>
+    <p>BaoCode Codex 1.7.11：旧会话的模型不再干扰新服务器</p>
+    <p>恢复一个旧会话时，线程里带着「以前跑它的那个模型」的名字（可能是别的产品的、
+    已下架的、或你自己的上游的）。把它报给现在的服务器，会得到
+    Model metadata not found 的警告并退回兜底元数据，可能影响表现。</p>
+    <p>修复</p>
+    <ul>
+    <li>恢复会话时，线程带来的模型名只在<strong>当前服务器认识它</strong>时才采用；
+    否则保留你当前选的模型——警告不再出现，回合按你的选择跑。</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.10">
     <h2 class="plain"><a href="#v1.7.10">1.7.10</a></h2>
     <p>BaoCode Codex 1.7.10：自定义模型的选择态修好</p>

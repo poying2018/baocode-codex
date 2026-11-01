@@ -30,6 +30,21 @@
   <h1>Changelog</h1>
   <p class="subtitle">What changed in each version of BaoCode.</p>
 
+  <section class="release" id="v1.7.11">
+    <h2 class="plain"><a href="#v1.7.11">1.7.11</a></h2>
+    <p>BaoCode Codex 1.7.11: a resumed thread no longer names a model this server lacks</p>
+    <p>Resuming an old thread carries the model of whatever ran it before - a
+    model of another product, one this server retired, or one of your own
+    upstreams. Naming it to the current server warns of fallback metadata and
+    can degrade the turn.</p>
+    <p>Fixed</p>
+    <ul>
+    <li>A resumed thread's model is adopted only when the current server lists
+    it; otherwise the model you picked stands - the warning is gone, and
+    the turn runs on your choice.</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.10">
     <h2 class="plain"><a href="#v1.7.10">1.7.10</a></h2>
     <p>BaoCode Codex 1.7.10: picking one of your own models shows as picked</p>
