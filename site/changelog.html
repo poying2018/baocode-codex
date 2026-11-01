@@ -30,6 +30,25 @@
   <h1>Changelog</h1>
   <p class="subtitle">What changed in each version of BaoCode.</p>
 
+  <section class="release" id="v1.7.12">
+    <h2 class="plain"><a href="#v1.7.12">1.7.12</a></h2>
+    <p>BaoCode Codex 1.7.12: an upstream of your own is spoken to in its own words</p>
+    <p>The 404's truth: the server on one of your upstreams was told
+    wire_api=responses and pointed at the proxy, which has no Responses
+    endpoint - five reconnects, then the conversation dead.</p>
+    <p>Fixed</p>
+    <ul>
+    <li>An OpenAI-compatible upstream (openai-chat, the common one) is told
+    wire_api=chat now: Codex speaks its native Chat Completions.</li>
+    <li>The proxy passes those straight through: the request and the answer
+    (a stream, or one JSON) as they are; only the key and the URL are
+    the proxy's.</li>
+    <li>The model-metadata warning under one of your upstreams is expected:
+    Codex has no metadata for the upstream's own model ids and falls back,
+    which does not affect the conversation.</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.11">
     <h2 class="plain"><a href="#v1.7.11">1.7.11</a></h2>
     <p>BaoCode Codex 1.7.11: a resumed thread no longer names a model this server lacks</p>

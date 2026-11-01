@@ -30,6 +30,22 @@
   <h1>更新日志</h1>
   <p class="subtitle">BaoCode 每个版本的变化。</p>
 
+  <section class="release" id="v1.7.12">
+    <h2 class="plain"><a href="#v1.7.12">1.7.12</a></h2>
+    <p>BaoCode Codex 1.7.12：自定义上游按它自己的话来说</p>
+    <p>404 的真相：给上游服务器的 wire_api=responses 指向代理，而代理没有 Responses
+    端点——连接重试五次后对话死掉。</p>
+    <p>修复</p>
+    <ul>
+    <li>OpenAI 兼容的上游（openai-chat，最常见）现在被告知 wire_api=chat：
+    Codex 用它原生的 Chat Completions 说话。</li>
+    <li>代理对这类请求<strong>直通</strong>：请求与回答（流或单个 JSON）原样转发，
+    代理只补上密钥与地址。</li>
+    <li>模型元数据的警告（fallback metadata）在上游模式下是预期的：
+    Codex 不认识上游自己模型 id 的元数据，退回兜底不影响对话。</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.11">
     <h2 class="plain"><a href="#v1.7.11">1.7.11</a></h2>
     <p>BaoCode Codex 1.7.11：旧会话的模型不再干扰新服务器</p>
