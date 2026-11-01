@@ -238,14 +238,23 @@ class CodexKernel
   /// upstreams the model as that upstream serves it (`dfmodel`), not the
   /// app's reference for the pick (`@provider/qoder-cn/dfmodel`) — the
   /// server knows its own by the short name, and the reference is not a
-  /// model to it. Resolved from the pick of the moment, so a change of
-  /// pick mid-conversation takes effect.
+  /// model to it. On the server's own models a name it does not list
+  /// (one saved from another product, or retired) is not named either —
+  /// the server's default is, which it has metadata for. Resolved from
+  /// the pick of the moment, so a change of pick takes effect.
   String? get _modelForRequests {
     final picked = _modelSelected;
     final parsed = parseModelRef(picked);
-    if (parsed == null) return picked;
-    final model = _providers?.resolve(picked)?.$2;
-    return model?.id ?? _upstream?.modelId;
+    if (parsed != null) {
+      return _providers?.resolve(picked)?.$2.id ?? _upstream?.modelId;
+    }
+    final named = picked ?? '';
+    if (_models.containsKey(named)) return named;
+    // The server's own default, when there is one: it has metadata.
+    final fallback = _models.values
+        .where((info) => info.isDefault)
+        .firstOrNull;
+    return fallback?.id ?? picked;
   }
 
   /// Picks [id] for this conversation. The turn asks for it by name; the
