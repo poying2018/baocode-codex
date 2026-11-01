@@ -12,6 +12,8 @@ import '../codex/codex_service.dart';
 import '../launch_environment.dart';
 import '../model_provider.dart';
 import '../upstream.dart';
+import 'translate/codex_responses_request.dart';
+import 'translate/codex_responses_response.dart';
 import 'translate/openai_chat_request.dart';
 import 'translate/openai_chat_response.dart';
 import 'translate/responses_request.dart';
@@ -133,10 +135,19 @@ class ModelProxy {
       if (!_authorized(request)) {
         return await _fail(response, 401, 'Not this proxy\'s token');
       }
-      // A Codex server on one of the user's OpenAI-compatible upstreams
-      // speaks Chat Completions straight through: its wire is the
-      // upstream's own, and only the key and the URL are the proxy's.
+      // A Codex server on one of the user's own upstreams speaks the
+      // Responses wire: its request is turned into Claude's Messages for
+      // the forwarding to the upstream, and the upstream's events back
+      // into the Responses events the server reads. An OpenAI-compatible
+      // one whose protocol asks for it has its Chat Completions passed
+      // straight through instead.
       final segments = request.uri.pathSegments;
+      if (request.method == 'POST' &&
+          segments.length == 3 &&
+          segments[0] == 'p' &&
+          segments[2] == 'responses') {
+        return await _codexResponses(segments[1], request, response);
+      }
       if (request.method == 'POST' &&
           segments.length == 3 &&
           segments[0] == 'p' &&
@@ -248,6 +259,118 @@ class ModelProxy {
     }
   }
 
+
+  /// A Codex server's Responses request, answered over one of the user's
+  /// OpenAI-compatible upstreams: the request is turned into OpenAI Chat
+  /// Completions for the upstream, and the upstream's events back into the
+  /// Responses events the server reads - through the same translators the
+  /// Claude side uses, once each way.
+  Future<void> _codexResponses(
+    String providerId,
+    HttpRequest request,
+    HttpResponse response,
+  ) async {
+    try {
+      final provider = _provider(providerId);
+      if (provider == null) {
+        return await _fail(response, 404, 'No such provider: $providerId');
+      }
+      if (provider.protocol != ProviderProtocol.openaiChat) {
+        return await _fail(
+          response,
+          501,
+          '${provider.name} speaks ${provider.protocol.id}: not answered here',
+        );
+      }
+      final body = jsonDecode(await utf8.decodeStream(request));
+      if (body is! Map<String, Object?>) {
+        return await _fail(response, 400, 'The request is not a JSON object');
+      }
+      final stream = body['stream'] != false;
+      final modelId = '${body['model'] ?? ''}';
+      final outgoing = convertResponsesRequestToClaude(modelId, body)
+        ..remove('model');
+      final chat = convertClaudeRequestToOpenAI(
+        modelId,
+        outgoing,
+        stream,
+        preserveThinking: provider.preserveThinking,
+      );
+      chat['model'] = modelId;
+      final url = UpstreamUrls.conversation(provider);
+      if (url == null) {
+        return await _fail(
+          response,
+          400,
+          '${provider.name} has no valid base URL',
+        );
+      }
+      final client = await _upstream();
+      final upstreamRequest = await client.postUrl(url);
+      final key = await _key(provider.id);
+      upstreamHeaders(provider, key).forEach(upstreamRequest.headers.set);
+      upstreamRequest.headers.contentType = ContentType.json;
+      if (stream) {
+        upstreamRequest.headers.set(
+          HttpHeaders.acceptHeader,
+          'text/event-stream',
+        );
+      }
+      upstreamRequest.add(utf8.encode(jsonEncode(chat)));
+      unawaited(
+        response.done.then<void>((_) {}, onError: (_) => upstreamRequest.abort()),
+      );
+      final answer = await upstreamRequest.close();
+      if (answer.statusCode >= 400) {
+        final text = await utf8.decodeStream(answer);
+        final message = upstreamErrorMessage(answer.statusCode, text);
+        _onError?.call(provider.id, message);
+        return await _json(response, answer.statusCode, {
+          'error': {'code': 'upstream_error', 'message': message},
+        });
+      }
+      _onError?.call(provider.id, null);
+      final builder = CodexResponseBuilder();
+      if (!stream) {
+        final text = await utf8.decodeStream(answer);
+        final message = convertOpenAIResponseToClaudeNonStream(chat, text);
+        final events = builder
+            .convert('data: ${jsonEncode(message)}')
+            .followedBy(builder.convert('data: [DONE]'))
+            .join();
+        await _events(response, events);
+        await response.close();
+      }
+      await _events(response, '');
+      final lines = answer
+          .transform(const Utf8Decoder(allowMalformed: true))
+          .transform(const LineSplitter());
+      await for (final line in lines) {
+        for (final frame in OpenAIChatResponseTranslator(chat).convert(line)) {
+          for (final event in builder.convert(frame)) {
+            response.write(event);
+          }
+          await response.flush();
+        }
+      }
+      for (final event in builder.finish()) {
+        response.write(event);
+      }
+      await response.flush();
+      await response.close();
+    } on Object catch (error) {
+      debugPrint('Model proxy (codex responses): $error');
+      await _fail(response, 502, '$error');
+    }
+  }
+
+  static Future<void> _events(HttpResponse response, String events) async {
+    response.headers.contentType =
+        ContentType('text', 'event-stream', charset: 'utf-8');
+    response.headers.set(HttpHeaders.cacheControlHeader, 'no-cache');
+    if (events.isNotEmpty) response.write(events);
+    await response.flush();
+  }
   Future<void> _forward(
     ModelProvider provider,
     Map<String, Object?> body,
