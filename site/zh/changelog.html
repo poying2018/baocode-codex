@@ -30,6 +30,21 @@
   <h1>更新日志</h1>
   <p class="subtitle">BaoCode 每个版本的变化。</p>
 
+  <section class="release" id="v1.7.13">
+    <h2 class="plain"><a href="#v1.7.13">1.7.13</a></h2>
+    <p>BaoCode Codex 1.7.13：代理学会说 Responses</p>
+    <p>1.7.12 的 stderr 揭出：Codex 0.166 已彻底废除 wire_api=chat（官方讨论 7782），
+    启动即死。唯一出路是代理自己会说 Responses。</p>
+    <p>修复</p>
+    <ul>
+    <li>上游服务器的 wire 恢复为 responses（必需）。</li>
+    <li>代理新增 Responses 端点：Codex 的请求被转换成上游说的形状（经与 Claude 侧
+    相同的转换器），上游的回答流再被转换回 Codex 读的事件——条目、文本增量、
+    工具调用与其参数、带用量的完成事件。</li>
+    <li>两个方向均有测试；未正常收尾的流也会被完整结束。</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.12">
     <h2 class="plain"><a href="#v1.7.12">1.7.12</a></h2>
     <p>BaoCode Codex 1.7.12：自定义上游按它自己的话来说</p>

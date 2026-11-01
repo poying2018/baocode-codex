@@ -30,6 +30,25 @@
   <h1>Changelog</h1>
   <p class="subtitle">What changed in each version of BaoCode.</p>
 
+  <section class="release" id="v1.7.13">
+    <h2 class="plain"><a href="#v1.7.13">1.7.13</a></h2>
+    <p>BaoCode Codex 1.7.13: the proxy learns to speak Responses</p>
+    <p>The stderr of 1.7.12 exposed it: Codex 0.166 dropped wire_api=chat
+    outright (its own discussion 7782), and the server died at start. The
+    only way through was for the proxy to speak Responses itself.</p>
+    <p>Fixed</p>
+    <ul>
+    <li>The upstream server's wire is responses again, as it must be.</li>
+    <li>The proxy has a Responses endpoint now: the server's request is turned
+    into the shape the upstream speaks (through the same translators the
+    Claude side uses), and the upstream's events back into the Responses
+    events the server reads - the items, the text deltas, the function
+    calls with their arguments, and the completed event with the usage.</li>
+    <li>Both directions are tested; a stream that ends without saying so is
+    finished whole.</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.12">
     <h2 class="plain"><a href="#v1.7.12">1.7.12</a></h2>
     <p>BaoCode Codex 1.7.12: an upstream of your own is spoken to in its own words</p>
