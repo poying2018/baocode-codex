@@ -133,7 +133,16 @@ class ModelProxy {
       if (!_authorized(request)) {
         return await _fail(response, 401, 'Not this proxy\'s token');
       }
+      // A Codex server on one of the user's OpenAI-compatible upstreams
+      // speaks Chat Completions straight through: its wire is the
+      // upstream's own, and only the key and the URL are the proxy's.
       final segments = request.uri.pathSegments;
+      if (request.method == 'POST' &&
+          segments.length == 3 &&
+          segments[0] == 'p' &&
+          segments[2] == 'chat/completions') {
+        return await _chatCompletions(segments[1], request, response);
+      }
       if (request.method != 'POST' ||
           segments.length < 4 ||
           segments[0] != 'p' ||
@@ -191,6 +200,50 @@ class ModelProxy {
       await _fail(response, 400, 'The request is not JSON: ${error.message}');
     } on Object catch (error) {
       debugPrint('Model proxy: $error');
+      await _fail(response, 502, '$error');
+    }
+  }
+
+  /// Chat Completions straight through to an OpenAI-compatible upstream:
+  /// a Codex server on one of the user's own speaks the upstream's own
+  /// wire, and the proxy adds only the key and the URL. The body and the
+  /// answer (a stream, or one JSON) pass as they are.
+  Future<void> _chatCompletions(
+    String providerId,
+    HttpRequest request,
+    HttpResponse response,
+  ) async {
+    try {
+      final provider = _provider(providerId);
+      if (provider == null) {
+        return await _fail(response, 404, 'No such provider: $providerId');
+      }
+      final url = UpstreamUrls.conversation(provider);
+      if (url == null) {
+        return await _fail(
+          response,
+          400,
+          '${provider.name} has no valid base URL',
+        );
+      }
+      final client = await _upstream();
+      final upstreamRequest = await client.postUrl(url);
+      final key = await _key(provider.id);
+      upstreamHeaders(provider, key).forEach(upstreamRequest.headers.set);
+      upstreamRequest.headers.contentType = ContentType.json;
+      upstreamRequest.add(utf8.encode(await utf8.decodeStream(request)));
+      unawaited(
+        response.done.then<void>((_) {}, onError: (_) => upstreamRequest.abort()),
+      );
+      final answer = await upstreamRequest.close();
+      response.statusCode = answer.statusCode;
+      final upstreamType = answer.headers.contentType;
+      if (upstreamType != null) {
+        response.headers.contentType = upstreamType;
+      }
+      await answer.pipe(response);
+    } on Object catch (error) {
+      debugPrint('Model proxy (chat): $error');
       await _fail(response, 502, '$error');
     }
   }

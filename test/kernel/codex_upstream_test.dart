@@ -12,6 +12,7 @@ void main() {
       id: 'deepseek',
       name: 'DeepSeek',
       baseUrl: 'https://api.deepseek.com',
+      protocol: ProviderProtocol.openaiChat,
       models: [ProviderModel(id: 'deepseek-chat')],
     );
     final upstream = CodexUpstream(
@@ -42,7 +43,9 @@ void main() {
       configs,
       contains('model_providers.deepseek.env_key="BAOCODE_CODEX_KEY_DEEPSEEK"'),
     );
-    expect(configs, contains('model_providers.deepseek.wire_api="responses"'));
+    // An OpenAI-compatible upstream is spoken to with Chat Completions:
+    // the proxy passes those straight through.
+    expect(configs, contains('model_providers.deepseek.wire_api="chat"'));
     expect(configs, contains('model_provider="deepseek"'));
     expect(launch.environment, {'BAOCODE_CODEX_KEY_DEEPSEEK': 'proxy-token'});
   });
