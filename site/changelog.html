@@ -30,6 +30,23 @@
   <h1>Changelog</h1>
   <p class="subtitle">What changed in each version of BaoCode.</p>
 
+  <section class="release" id="v1.7.14">
+    <h2 class="plain"><a href="#v1.7.14">1.7.14</a></h2>
+    <p>BaoCode Codex 1.7.14: the wire finally matches</p>
+    <p>The log of 1.7.13 spoke once more: the upstream server still received
+    wire_api=chat - the Responses endpoint in the proxy was fixed, but the
+    wire in the upstream's configuration was left as chat. Both halves have
+    to be done for it to work.</p>
+    <p>Fixed</p>
+    <ul>
+    <li>The upstream's wire is responses, the one this Codex accepts; the
+    proxy's Responses endpoint (in place since 1.7.13) carries the whole
+    conversation.</li>
+    <li>The chain is now: Codex speaks Responses, the proxy translates, the
+    upstream answers in its own words, and it is translated back.</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.13">
     <h2 class="plain"><a href="#v1.7.13">1.7.13</a></h2>
     <p>BaoCode Codex 1.7.13: the proxy learns to speak Responses</p>
