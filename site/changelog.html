@@ -30,6 +30,23 @@
   <h1>Changelog</h1>
   <p class="subtitle">What changed in each version of BaoCode.</p>
 
+  <section class="release" id="v1.7.15">
+    <h2 class="plain"><a href="#v1.7.15">1.7.15</a></h2>
+    <p>BaoCode Codex 1.7.15: a model the server does not know is not named to it</p>
+    <p>The pick of a conversation can be a model the current server knows
+    nothing of - one saved from another product, or retired since. Naming it
+    to the server warns of fallback metadata and can degrade the turn.</p>
+    <p>Fixed</p>
+    <ul>
+    <li>When the pick is not a reference to one of your upstreams and the
+    server does not list it, what is named to the server is <strong>the server's
+    own default model</strong> (which has metadata) - the warning is gone, and
+    the turn runs on what the server can do.</li>
+    <li>The picker still shows what you picked (Chosen for this
+    conversation); your choice is unchanged.</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.14">
     <h2 class="plain"><a href="#v1.7.14">1.7.14</a></h2>
     <p>BaoCode Codex 1.7.14: the wire finally matches</p>

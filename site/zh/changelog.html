@@ -30,6 +30,19 @@
   <h1>更新日志</h1>
   <p class="subtitle">BaoCode 每个版本的变化。</p>
 
+  <section class="release" id="v1.7.15">
+    <h2 class="plain"><a href="#v1.7.15">1.7.15</a></h2>
+    <p>BaoCode Codex 1.7.15：服务器不认识的模型不再报给它</p>
+    <p>会话的所选模型可能是当前服务器不知道的——别的产品存下的、或已下架的。
+    把它报给服务器，会得到 Model metadata not found 的警告并退回兜底元数据。</p>
+    <p>修复</p>
+    <ul>
+    <li>所选的不是你自己的上游引用、而服务器又没列出它时，报给服务器的是
+    <strong>服务器自己的默认模型</strong>（它有元数据）——警告消失，回合按服务器的能力跑。</li>
+    <li>选择器仍显示你选的那个（Chosen for this conversation），你的选择不变。</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.14">
     <h2 class="plain"><a href="#v1.7.14">1.7.14</a></h2>
     <p>BaoCode Codex 1.7.14：wire 终于对上了</p>
