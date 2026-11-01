@@ -228,15 +228,20 @@ class CodexKernel
     ];
   }
 
-  /// What is in effect: the pick, or the first offered when nothing is.
-  /// On one of the user's own upstreams the name is the model as that
-  /// upstream serves it (`dfmodel`), not the app's reference for the
-  /// pick (`@provider/qoder-cn/dfmodel`) — the server knows its own by
-  /// the short name, and the reference is not a model to it. The name
-  /// comes from the pick of the moment, not from the server the last
-  /// turn ran on: a change of pick mid-conversation takes effect.
-  String? get _modelSelected {
-    final picked = _pickedModel ?? _modelOptions.firstOrNull?.id;
+  /// What the picker shows as in effect: the pick as it was made — a
+  /// reference for one of the user's own upstreams, a server model name
+  /// otherwise — or the first offered when nothing is. The picker's ids
+  /// live in this space, so a pick can be told from another.
+  String? get _modelSelected => _pickedModel ?? _modelOptions.firstOrNull?.id;
+
+  /// The model a request to the server names: on one of the user's own
+  /// upstreams the model as that upstream serves it (`dfmodel`), not the
+  /// app's reference for the pick (`@provider/qoder-cn/dfmodel`) — the
+  /// server knows its own by the short name, and the reference is not a
+  /// model to it. Resolved from the pick of the moment, so a change of
+  /// pick mid-conversation takes effect.
+  String? get _modelForRequests {
+    final picked = _modelSelected;
     final parsed = parseModelRef(picked);
     if (parsed == null) return picked;
     final model = _providers?.resolve(picked)?.$2;
@@ -795,9 +800,9 @@ class CodexKernel
               'text': _planNote,
             },
         ],
-        'model': _modelSelected,
-        'effort': ?_effortFor(_modelSelected ?? ''),
-        'serviceTierForTurn': ?_tierFor(_modelSelected ?? ''),
+        'model': _modelForRequests,
+        'effort': ?_effortFor(_modelForRequests ?? ''),
+        'serviceTierForTurn': ?_tierFor(_modelForRequests ?? ''),
         'approvalPolicy': readOnly
             ? 'never'
             : switch (_permission) {
@@ -872,8 +877,8 @@ class CodexKernel
 
   Map<String, Object?> _threadParameters() => {
     'cwd': _protocolCwd,
-    'model': _modelSelected,
-    'serviceTier': ?_tierFor(_modelSelected ?? ''),
+    'model': _modelForRequests,
+    'serviceTier': ?_tierFor(_modelForRequests ?? ''),
     'developerInstructions': ?_developerInstructions,
   };
 
