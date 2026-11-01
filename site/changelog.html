@@ -30,6 +30,23 @@
   <h1>Changelog</h1>
   <p class="subtitle">What changed in each version of BaoCode.</p>
 
+  <section class="release" id="v1.7.10">
+    <h2 class="plain"><a href="#v1.7.10">1.7.10</a></h2>
+    <p>BaoCode Codex 1.7.10: picking one of your own models shows as picked</p>
+    <p>1.7.9 made the model in effect the upstream's own short name everywhere -
+    the picker's checked state included. The picker's option names are
+    references (@provider/...), which never equal the short name, so nothing
+    you picked ever showed as picked: it looked like the custom models could
+    not be chosen at all.</p>
+    <p>Fixed</p>
+    <ul>
+    <li>What the picker sees: your pick as it was made (the reference) - the
+    checked state is right from now on.</li>
+    <li>What the server receives: the model as the upstream serves it -
+    converted only when a request is actually made.</li>
+    </ul>
+  </section>
+
   <section class="release" id="v1.7.9">
     <h2 class="plain"><a href="#v1.7.9">1.7.9</a></h2>
     <p>BaoCode Codex 1.7.9: changing the model mid-conversation really works</p>
