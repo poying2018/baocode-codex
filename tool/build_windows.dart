@@ -114,10 +114,10 @@ const _claudeUrl =
 /// build checked against that checksum, so that a build carries that one
 /// build and no other: after choosing another version, update these three
 /// (tool/bump_codex_version.dart does it, and says when one is out).
-const _codexVersion = '0.167.0';
+const _codexVersion = '0.167.1';
 const _codexPlatform = 'win32-x64';
 const _codexIntegrity =
-    'sha512-duPCBwflc8qhQdLekbL8fDYF646tW4gj0/l9BDnsVhEzoqm6OwxMAJXDFwSOLUUJPCmjBeM+eHYAx4fP/hwfjg==';
+    'sha512-yvUA7s46paDIT5I3Phz8KcoGpSGlWR3pOS0npqQ3LQMpjtTOBWoLPRdjuoKVreuKIuOLDMxwWCID4nwojbbrSA==';
 
 /// Where that package is: the npm registry's own file for the platform.
 const _codexUrl =
